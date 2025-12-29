@@ -1,6 +1,8 @@
-# Data and code examples in Python and R for "Everyday causal inference"
+# Data and code examples in Python and R for the book [*Everyday causal inference*](https://www.everydaycausal.com/)
 
-**Installing R or Python:** You can read this book without running the code, but following along with the exercises is the best way to learn. To do that, you’ll need R or Python installed. If you need a setup guide, see the "Intro" chapter of [R for Data Science](https://r4ds.hadley.nz/intro.html) for R or "Preliminaries" in [Python for Data Analysis](https://wesmckinney.com/book/preliminaries) for Python.
+**The book**: At [www.everydaycausal.com](https://www.everydaycausal.com) you will learn how to find causal answers to your everyday questions. And rest assured: you don’t need any advanced background to master the ideas here. Every concept is broken down step-by-step, with relatable examples. 
+
+You can read this book without running the code, but following along with the exercises is the best way to learn. To do that, you’ll need *R or Python* installed. If you need a setup guide, see the "Intro" chapter of [R for Data Science](https://r4ds.hadley.nz/intro.html) for R or "Preliminaries" in [Python for Data Analysis](https://wesmckinney.com/book/preliminaries) for Python.
 
 **Data:** All data used in the book is available in this repository. You can download it manually from the [data folder](https://github.com/RobsonTigre/everyday-ci/tree/main/data) or load it directly by passing the raw URL to `read.csv()` (R) or `pd.read_csv()` (Python).
 
