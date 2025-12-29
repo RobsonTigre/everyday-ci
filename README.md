@@ -1,4 +1,4 @@
-# Data and code examples in Python and R for the book [*Everyday causal inference*](https://www.everydaycausal.com/)
+# Data and code for the book [*Everyday causal inference*](https://www.everydaycausal.com/), in Python and R
 
 **The book**: At [www.everydaycausal.com](https://www.everydaycausal.com) you will learn how to find causal answers to your everyday questions. And rest assured: you don’t need any advanced background to master the ideas here. Every concept is broken down step-by-step, with relatable examples. 
 
