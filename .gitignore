@@ -1,0 +1,6 @@
+# Google Drive temp files and folders
+.tmp.driveupload/
+.tmp.drivedownload/
+~$*
+.~*
+*.tmp
