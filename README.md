@@ -1,6 +1,6 @@
 # Everyday Causal Inference — Data and Code Repository
 
-> Learn how to find causal answers to your everyday questions using R and Python.
+Learn how to find causal answers to your everyday questions using R and Python.
 
 ## About the book
 
@@ -15,43 +15,39 @@ You can read the book without running any code, but following along with the exe
 All datasets used in the book are available in the [data folder](https://github.com/RobsonTigre/everyday-ci/tree/main/data). You can either:
 
 - **Download manually** from the folder above, or
-- **Load directly** in your code using the raw URL pattern:
+- **Load directly** in your code by passing the raw URL to `read.csv()` in R or `pd.read_csv()` in Python:
 
 ```
 https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/<filename>.csv
 ```
 
-For example, to load `advertising_data.csv`:
-
-```r
-# R
-df <- read.csv("https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/advertising_data.csv")
-```
-
-```python
-# Python
-import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/advertising_data.csv")
-```
-
-## Stay updated
+## Contribute and stay updated
 
 - ⭐ **Star this repo** to signal interest and get updates.
-- 🔔 **Follow the [author on LinkedIn](https://www.linkedin.com/in/robson-tigre/)** for new chapters and announcements.
-- 📬 **[Subscribe here](https://tally.so/r/0Q7z7P)** to be notified when new content is released.
-
-## Contribute
-
-Found an error or have a suggestion? [Submit feedback here](https://tally.so/r/obbx0V).
+- 🔔 **Follow the [author](https://www.linkedin.com/in/robson-tigre/)** for weekly posts on causal inference.
+- 📬 **[Subscribe](https://tally.so/r/0Q7z7P)** to be notified when new content is released.
+- 🚩 **Feedback:** Found an error or have a suggestion? [Submit feedback here](https://tally.so/r/obbx0V).
 
 ## Citation
 
 If you use this material in your work, please cite:
 
-> Tigre, Robson. *Everyday Causal Inference: How to estimate, test, and explain impacts with R and Python.* https://www.everydaycausal.com/
+*Tigre, Robson. Everyday Causal Inference: How to estimate, test, and explain impacts with R and Python. https://www.everydaycausal.com/*
 
 ## Legal notice
 
-Copyright © 2025 by Robson Tigre. All rights reserved. You may read, share official links, and cite short excerpts for learning purposes, provided you credit the source. However, you may not reproduce, redistribute, or use any part of this book (including text and code) to train AI systems without explicit permission.
+Copyright © 2025 by Robson Tigre. All rights reserved.
 
-This content is for educational purposes only and does not constitute professional advice. All code is provided "as is," without warranty. The author disclaims all liability for outcomes based on this material. The full legal notice is available [here](https://www.everydaycausal.com/legal.html).
+**You may:**
+- Read the book and run the code for personal learning
+- Share official links to the book or repository
+- Cite short excerpts with proper attribution
+
+**You may not:**
+- Reproduce or redistribute the text, code, or data
+- Use any part of this work to train AI or machine learning systems
+- Create competing courses, tutorials, or educational products based on this material
+- Build commercial training datasets from this content
+- Develop or market products using the "Everyday Causal Inference" name or variants
+
+This content is for educational purposes only and does not constitute professional advice. All code is provided "as is," without warranty. The author disclaims all liability for outcomes based on this material. See the full [legal notice](https://www.everydaycausal.com/legal.html) for details.
