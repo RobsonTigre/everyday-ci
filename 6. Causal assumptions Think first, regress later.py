@@ -6,7 +6,7 @@
 ##########################################################
 ## Code for Chapter 6 - Causal assumptions: Think first, regress later
 ## Created: Dec 25, 2025
-## Last modified: Dec 31, 2025
+## Last modified: Jan 02, 2026
 ##########################################################
 
 import numpy as np
@@ -333,8 +333,127 @@ ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.15), ncol=3, frameon=False
 ax.text(0.5, -0.22, "Takeaway: Ignoring confounders (store location) can completely reverse your conclusions.",
         transform=ax.transAxes, ha="center", fontsize=10, color="grey")
 
-plt.show()
-
 # plt.tight_layout()
 # plt.savefig("/Users/robsontigre/Desktop/everyday-causal-inference/images/simpsons_paradox.png", dpi=300, bbox_inches="tight")
+# plt.close()
+
+
+#########################################
+# Common Support / Extrapolation Danger
+#########################################
+
+np.random.seed(2026)
+n = 1000
+
+# 1. COVARIATE: Net worth (R$, in thousands)
+# Range from 50K to 800K
+net_worth = np.random.uniform(50, 800, n)
+
+# 2. TREATMENT ASSIGNMENT: Premium account
+# Probability of premium increases steeply with net worth
+# - Below 100K: almost no one has premium
+# - 100K-500K: overlap zone (some have, some don't)
+# - Above 500K: almost everyone has premium
+prob_premium = expit(-8 + 0.025 * net_worth)
+premium = np.random.binomial(1, prob_premium)
+
+# 3. POTENTIAL OUTCOMES
+# Simple linear relationship: returns increase with net worth
+# The key issue is that we have NO CONTROL DATA to learn from above 500K.
+
+# True treatment effect (constant)
+tau = 5
+
+# Y(0): Untreated potential outcome (linear relationship)
+y0_true = 5 + 0.008 * net_worth + np.random.normal(0, 1.5, n)
+
+# Y(1): Treated potential outcome
+y1_true = y0_true + tau + np.random.normal(0, 0.5, n)
+
+# 4. OBSERVED OUTCOME
+returns = np.where(premium == 1, y1_true, y0_true)
+
+df_overlap = pd.DataFrame({
+    "net_worth": net_worth,
+    "premium": np.where(premium == 0, "Non-Premium", "Premium"),
+    "returns": returns
+})
+
+# Save data
+# df_overlap.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/overlap_demo.csv", index=False)
+
+# Read the data
+df_overlap = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/overlap_demo.csv")
+
+# 5. FIT THE LINEAR MODEL
+# The model learns Y = alpha + tau*D + beta*X from all available data
+# Key issue: it must extrapolate for wealthy customers where no control data exists
+df_overlap["premium_dummy"] = (df_overlap["premium"] == "Premium").astype(int)
+X_overlap = sm.add_constant(df_overlap[["premium_dummy", "net_worth"]])
+model_overlap = sm.OLS(df_overlap["returns"], X_overlap).fit()
+print(model_overlap.summary())
+
+# Extract coefficients
+alpha_hat = model_overlap.params["const"]
+tau_hat = model_overlap.params["premium_dummy"]
+beta_hat = model_overlap.params["net_worth"]
+
+print(f"Estimated treatment effect: {tau_hat:.2f} (True: {tau:.2f})")
+print(f"Estimated slope (beta): {beta_hat:.4f}")
+
+# 6. CREATE PREDICTION LINES
+# Grid of net worth values for smooth prediction lines
+x_grid = np.linspace(50, 800, 200)
+
+# Model's predicted counterfactual for control (Y_hat(0))
+y_hat_0 = alpha_hat + beta_hat * x_grid
+
+# Model's predicted treated outcome (Y_hat(1))
+y_hat_1 = alpha_hat + tau_hat + beta_hat * x_grid
+
+# 7. VISUALIZATION
+fig, ax = plt.subplots(figsize=(11, 8))
+
+# Shaded overlap zone (where we have both treated and control data)
+ax.axvspan(50, 500, alpha=0.15, color="#90EE90", zorder=0)
+
+# Shaded danger zone (no control data above 500K)
+ax.axvspan(500, 800, alpha=0.1, color=book_colors["accent"], zorder=0)
+
+# Scatter points (observed data)
+for prem_val, color in [("Non-Premium", book_colors["accent"]), ("Premium", book_colors["primary"])]:
+    subset = df_overlap[df_overlap["premium"] == prem_val]
+    ax.scatter(subset["net_worth"], subset["returns"], alpha=0.5, s=20, color=color, label=prem_val)
+
+# Model's predicted control line (solid in overlap, dashed in extrapolation)
+mask_overlap = x_grid <= 500
+mask_extrapolate = x_grid >= 500
+
+ax.plot(x_grid[mask_overlap], y_hat_0[mask_overlap], color=book_colors["accent"], linewidth=1.2)
+ax.plot(x_grid[mask_extrapolate], y_hat_0[mask_extrapolate], color=book_colors["accent"], linewidth=1.2, 
+        linestyle="--", label="Model's extrapolation")
+
+# Model's predicted treated line
+ax.plot(x_grid, y_hat_1, color=book_colors["primary"], linewidth=1.2)
+
+# Vertical line marking the boundary
+ax.axvline(x=500, linestyle="dotted", color=book_colors["muted"], linewidth=0.8)
+
+# Annotations
+ax.annotate("Danger zone\nNo control data here", xy=(650, 2), fontsize=10, fontstyle="italic",
+            color=book_colors["accent"], ha="center",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="#FEF1E0", edgecolor="none"))
+ax.annotate("Overlap zone\nBoth groups observed", xy=(275, 2), fontsize=10, fontstyle="italic",
+            color="#2E8B57", ha="center",
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="#E8FCE8", edgecolor="none"))
+
+ax.set_xlabel("Net worth (R$ thousands)")
+ax.set_ylabel("Investment returns (%)")
+ax.set_title("Lack of overlap: when regression becomes a guess", fontweight="bold")
+ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.15), ncol=3, frameon=False)
+ax.text(0.5, -0.22, "Orange points = Non-Premium (control). Blue points = Premium (treated).\nDashed orange line = model's extrapolation into the danger zone.",
+        transform=ax.transAxes, ha="center", fontsize=9, color="grey")
+
+# plt.tight_layout()
+# plt.savefig("/Users/robsontigre/Desktop/everyday-causal-inference/images/common_support.png", dpi=300, bbox_inches="tight")
 # plt.close()
