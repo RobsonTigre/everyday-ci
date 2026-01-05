@@ -1,5 +1,6 @@
 ##########################################################
 ## Everyday Causal Inference: How to estimate, test, and explain impacts with R and Python 
+## www.everydaycausal.com
 ## Copyright © 2025 by Robson Tigre. All rights reserved. 
 ## You may read, share, and cite for learning purposes, provided you credit the source.
 ## It should not be used to create competing educational or commercial products
