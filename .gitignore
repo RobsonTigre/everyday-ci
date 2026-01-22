@@ -4,3 +4,21 @@
 ~$*
 .~*
 *.tmp
+
+# R
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+
+# System & Other
+.DS_Store
+.quarto/
