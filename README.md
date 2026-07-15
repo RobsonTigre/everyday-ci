@@ -21,6 +21,24 @@ All datasets used in the book are available in the [data folder](https://github.
 https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/<filename>.csv
 ```
 
+### Setup
+
+To install every package used across the book's code examples in one go:
+
+**Python** (tested with 3.9+):
+
+```bash
+pip install -r requirements.txt
+```
+
+**R**:
+
+```bash
+Rscript install.R
+```
+
+or run `source("install.R")` from an R session. Each script also lists its own packages in a comment at the top, so you can install per chapter instead.
+
 ## Companion AI plugin: Everyday Causal Skills
 
 The book has an optional companion, [everyday-causal-skills](https://github.com/RobsonTigre/everyday-causal-skills) — a free plugin that gives your AI coding agent (Claude Code, Gemini CLI, GitHub Copilot CLI, Codex CLI, or Cursor) the workflow taught in the book: describe your causal question in plain language, get a method recommendation, check the assumptions, write the analysis in R or Python, stress-test the results, and compile a report.
@@ -44,10 +62,4 @@ If you use this material in your work, please cite:
 
 ## Legal notice
 
-Copyright © 2025 by Robson Tigre. All rights reserved.
-
-**You may:** Read the book and run the code for personal learning; Share official links to the book or repository; Cite short excerpts with proper attribution.
-
-**You may not:** Reproduce or redistribute the text, code, or data; Use any part of this work to train AI or machine learning systems; Create competing courses, tutorials, or educational products based on this material; Build commercial training datasets from this content; Develop or market products using this book's name or its variants.
-
-This content is for educational purposes only and does not constitute professional advice. All code is provided "as is," without warranty. The author disclaims all liability for outcomes based on this material. See the full [legal notice](https://www.everydaycausal.com/legal.html) for details.
+Copyright © 2025 by Robson Tigre. All rights reserved. You are welcome to clone this repository and run the code and data for personal learning, but not to redistribute the material or use it to train AI systems. See [LICENSE.md](LICENSE.md) for the full terms and the [legal notice](https://www.everydaycausal.com/legal.html) for details.

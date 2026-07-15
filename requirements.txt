@@ -1,0 +1,15 @@
+# Python dependencies for the Everyday Causal Inference code examples
+# Tested with Python 3.9+. Install with: pip install -r requirements.txt
+# Note: pycausalarima (chapter 11 only) needs Python 3.10+; pip skips it on older versions.
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+statsmodels
+linearmodels
+diff-diff
+rdrobust
+rddensity
+causalimpact
+pycausalarima @ git+https://github.com/RobsonTigre/pycausalarima.git ; python_version >= "3.10"
