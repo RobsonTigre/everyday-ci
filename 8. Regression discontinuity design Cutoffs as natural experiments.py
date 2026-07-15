@@ -102,13 +102,13 @@ data = pd.DataFrame({
 })
 
 # Save the data to CSV
-# data.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/sharp_rdd_data_example.csv", index=False)
+# data.to_csv("data/sharp_rdd_data_example.csv", index=False)
 
 # -----------------------------------------------------------------------------
 # 3. Analysis: Recovering the Causal Effect
 # -----------------------------------------------------------------------------
 # Load pre-generated data (or use the data frame we just created):
-data = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/sharp_rdd_data_example.csv")
+data = pd.read_csv("data/sharp_rdd_data_example.csv")
 
 print(data.describe())
 print(data.info())
@@ -372,14 +372,14 @@ data_fuzzy = pd.DataFrame({
 })
 
 # Save the data
-# data_fuzzy.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/rdd_fuzzy_fintech.csv", index=False)
+# data_fuzzy.to_csv("data/rdd_fuzzy_fintech.csv", index=False)
 
 # -----------------------------------------------------------------------------
 # 4.1 Demonstrating the Selection Problem
 # -----------------------------------------------------------------------------
 
 # Load data (or use the data frame we just created)
-data_fuzzy = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/rdd_fuzzy_fintech.csv")
+data_fuzzy = pd.read_csv("data/rdd_fuzzy_fintech.csv")
 
 # Before running Fuzzy RDD, let's see why naive comparisons fail.
 

@@ -45,11 +45,11 @@ df <- data.frame(
 )
 
 # Save the simulated data
-# write.csv(df, "/Users/robsontigre/Desktop/everyday-ci/data/personalized_feed_experiment.csv", row.names = FALSE)
+# write.csv(df, "data/personalized_feed_experiment.csv", row.names = FALSE)
 
 options(scipen = 999)
 
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/personalized_feed_experiment.csv")
+df <- read.csv("data/personalized_feed_experiment.csv")
 
 # balance table between treatment and control groups with t-tests for all variables
 balance_table <- balance_table(

@@ -125,7 +125,7 @@ df <- data.frame(
 )
 
 # Save for later use
-# write.csv(df, "/Users/robsontigre/Desktop/everyday-ci/data/daily_communications.csv", row.names = FALSE)
+# write.csv(df, "data/daily_communications.csv", row.names = FALSE)
 
 head(df)
 # skimr::skim(df)
@@ -150,7 +150,7 @@ head(df)
 #########################################
 
 # Read the data from csv
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/daily_communications.csv")
+df <- read.csv("data/daily_communications.csv")
 
 # First stage: effect of invitation on daily email adoption
 first_stage <- feols(

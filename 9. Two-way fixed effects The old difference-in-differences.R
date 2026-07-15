@@ -138,14 +138,14 @@ data <- expand_grid(
     select(store, period, state, treatment, sales, treated_period, relative_period)
 
 # Save the dataset
-# write.csv(data, "/Users/robsontigre/Desktop/everyday-ci/data/did-twfe-ooh.csv", row.names = FALSE)
+# write.csv(data, "data/did-twfe-ooh.csv", row.names = FALSE)
 # Data saved to the specified path
 
 
 # ==========================================================
 # DESCRIPTIVE STATISTICS
 # ==========================================================
-data <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/did-twfe-ooh.csv")
+data <- read.csv("data/did-twfe-ooh.csv")
 
 # Quick summary of the dataset structure and distributions
 skim(data)

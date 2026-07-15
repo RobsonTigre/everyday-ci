@@ -25,7 +25,7 @@ df_ads <- data.frame(sales, ad_spend, holiday)
 # write.csv(df_ads, "data/advertising_data.csv", row.names = FALSE)
 
 # regression analysis
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/advertising_data.csv")
+df <- read.csv("data/advertising_data.csv")
 
 # fit and summarize simple regression model
 simple_regression <- lm(sales ~ ad_spend, data = df)
@@ -64,9 +64,9 @@ y <- 10 + 2 * new_ui + 1 * is_ios
 y <- y + ifelse(user_segment == "Power", 5, 0) + ifelse(user_segment == "Business", 8, 0)
 y <- y + 1.5 * (new_ui * is_ios) + 2 * account_age - 0.3 * (account_age^2) + rnorm(n, 0, 1)
 df_ui <- data.frame(time_on_app = y, new_ui, is_ios, user_segment, account_age)
-# write.csv(df_ui, "/Users/robsontigre/Desktop/everyday-ci/data/tricky_coefficients.csv", row.names = FALSE)
+# write.csv(df_ui, "data/tricky_coefficients.csv", row.names = FALSE)
 
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/tricky_coefficients.csv")
+df <- read.csv("data/tricky_coefficients.csv")
 m1 <- lm(time_on_app ~ new_ui, data = df)
 summary(m1)
 
@@ -122,9 +122,9 @@ n <- 1000
 discount_email <- c(rep(0, n / 2), rep(1, n / 2))
 amount_spent <- 100 + 5 * discount_email + rnorm(n, mean = 0, sd = 10)
 df_email <- data.frame(discount_email, amount_spent)
-# write.csv(df_email, "/Users/robsontigre/Desktop/everyday-ci/data/email_campaign.csv", row.names = FALSE)
+# write.csv(df_email, "data/email_campaign.csv", row.names = FALSE)
 
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/email_campaign.csv")
+df <- read.csv("data/email_campaign.csv")
 
 # fit the model
 model <- lm(amount_spent ~ discount_email, data = df)
@@ -147,7 +147,7 @@ confint(model)
 ##################################
 
 # read the data from csv
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/advertising_data.csv")
+df <- read.csv("data/advertising_data.csv")
 # calculate mean sales
 mean_sales <- mean(df$sales)
 print(mean_sales) # R$ 266.44

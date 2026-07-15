@@ -42,13 +42,13 @@ df = pd.DataFrame({
 })
 
 # Save the data as CSV
-# df.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/recommend_spend.csv", index=False)
+# df.to_csv("data/recommend_spend.csv", index=False)
 
 import pandas as pd # Data manipulation
 import statsmodels.formula.api as smf # Linear regression
 
 # Read the CSV file
-df = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/recommend_spend.csv")
+df = pd.read_csv("data/recommend_spend.csv")
 
 # Run the regression
 simple_regression = smf.ols('total_spent ~ recommendations_shown', data=df).fit()

@@ -145,14 +145,14 @@ data = data.sort_values(['store', 'period']).reset_index(drop=True)
 data = data[['store', 'period', 'state', 'treatment', 'sales', 'treated_period', 'relative_period']]
 
 # Save the dataset
-# data.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/did-twfe-ooh.csv", index=False)
+# data.to_csv("data/did-twfe-ooh.csv", index=False)
 # Data saved to the specified path
 
 
 # ==========================================================
 # DESCRIPTIVE STATISTICS
 # ==========================================================
-data = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/did-twfe-ooh.csv")
+data = pd.read_csv("data/did-twfe-ooh.csv")
 
 # Quick summary of the dataset structure and distributions
 print(data.describe())

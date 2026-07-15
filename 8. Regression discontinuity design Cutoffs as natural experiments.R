@@ -95,13 +95,13 @@ data <- data.frame(
 )
 
 # Save the data to CSV
-# write.csv(data, "/Users/robsontigre/Desktop/everyday-ci/data/sharp_rdd_data_example.csv", row.names = FALSE)
+# write.csv(data, "data/sharp_rdd_data_example.csv", row.names = FALSE)
 
 # -----------------------------------------------------------------------------
 # 3. Analysis: Recovering the Causal Effect
 # -----------------------------------------------------------------------------
 # Load pre-generated data (or use the data frame we just created):
-data <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/sharp_rdd_data_example.csv")
+data <- read.csv("data/sharp_rdd_data_example.csv")
 
 skimr::skim(data)
 
@@ -391,14 +391,14 @@ data_fuzzy <- data.frame(
 )
 
 # Save the data
-# write.csv(data_fuzzy, "/Users/robsontigre/Desktop/everyday-ci/data/rdd_fuzzy_fintech.csv", row.names = FALSE)
+# write.csv(data_fuzzy, "data/rdd_fuzzy_fintech.csv", row.names = FALSE)
 
 # -----------------------------------------------------------------------------
 # 4.1 Demonstrating the Selection Problem
 # -----------------------------------------------------------------------------
 
 # Load data (or use the data frame we just created)
-data_fuzzy <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/rdd_fuzzy_fintech.csv")
+data_fuzzy <- read.csv("data/rdd_fuzzy_fintech.csv")
 
 # Before running Fuzzy RDD, let's see why naive comparisons fail.
 

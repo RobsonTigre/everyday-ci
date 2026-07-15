@@ -40,11 +40,11 @@ df <- data.frame(
 )
 
 # Save the data as CSV
-# write.csv(df, "/Users/robsontigre/Desktop/everyday-ci/data/recommend_spend.csv", row.names = FALSE)
+# write.csv(df, "data/recommend_spend.csv", row.names = FALSE)
 
 
 # Read the CSV file
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/recommend_spend.csv")
+df <- read.csv("data/recommend_spend.csv")
 
 # Run the regression
 simple_regression <- lm(total_spent ~ recommendations_shown, data = df)

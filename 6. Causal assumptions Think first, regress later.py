@@ -96,12 +96,12 @@ df = pd.DataFrame({
 })
 
 # Saving data as CSV
-# df.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/engagement.csv", index=False)
+# df.to_csv("data/engagement.csv", index=False)
 
 # --- RUNNING THE REGRESSIONS ---
 
 # Reading the data
-df = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/engagement.csv")
+df = pd.read_csv("data/engagement.csv")
 
 
 # Helper function to run OLS and extract estimate and SE for 'premium'
@@ -176,10 +176,10 @@ revenue = 50 + 8 * emails - 0.8 * emails**2 + np.random.normal(0, 5, n)
 df_email = pd.DataFrame({"emails": emails, "revenue": revenue})
 
 # Save to CSV for reproducibility
-# df_email.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/email_frequency.csv", index=False)
+# df_email.to_csv("data/email_frequency.csv", index=False)
 
 # Reading the data
-df_email = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/email_frequency.csv")
+df_email = pd.read_csv("data/email_frequency.csv")
 
 # Misspecified model: linear only
 X_linear = sm.add_constant(df_email["emails"])
@@ -233,7 +233,7 @@ ax.text(0.5, -0.22, "Takeaway: When the true relationship is nonlinear, a linear
         transform=ax.transAxes, ha="center", fontsize=10, color="grey")
 
 # plt.tight_layout()
-# plt.savefig("/Users/robsontigre/Desktop/everyday-causal-inference/images/non_linearity.png", dpi=300, bbox_inches="tight")
+# plt.savefig("images/non_linearity.png", dpi=300, bbox_inches="tight")
 # plt.close()
 
 
@@ -269,10 +269,10 @@ sales = np.where(location == "high_traffic", 70, 35) + 3 * ad_spend + np.random.
 df_simpson = pd.DataFrame({"location": location, "ad_spend": ad_spend, "sales": sales})
 
 # Save data as CSV
-# df_simpson.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/simpsons_paradox.csv", index=False)
+# df_simpson.to_csv("data/simpsons_paradox.csv", index=False)
 
 # Reading the data
-df_simpson = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/simpsons_paradox.csv")
+df_simpson = pd.read_csv("data/simpsons_paradox.csv")
 
 # Aggregate analysis (wrong - shows NEGATIVE relationship!)
 X_agg = sm.add_constant(df_simpson["ad_spend"])
@@ -338,7 +338,7 @@ ax.text(0.5, -0.22, "Takeaway: Ignoring confounders (store location) can complet
         transform=ax.transAxes, ha="center", fontsize=10, color="grey")
 
 # plt.tight_layout()
-# plt.savefig("/Users/robsontigre/Desktop/everyday-causal-inference/images/simpsons_paradox.png", dpi=300, bbox_inches="tight")
+# plt.savefig("images/simpsons_paradox.png", dpi=300, bbox_inches="tight")
 # plt.close()
 
 
@@ -384,10 +384,10 @@ df_overlap = pd.DataFrame({
 })
 
 # Save data
-# df_overlap.to_csv("/Users/robsontigre/Desktop/everyday-ci/data/overlap_demo.csv", index=False)
+# df_overlap.to_csv("data/overlap_demo.csv", index=False)
 
 # Read the data
-df_overlap = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/overlap_demo.csv")
+df_overlap = pd.read_csv("data/overlap_demo.csv")
 
 # 5. FIT THE LINEAR MODEL
 # The model learns Y = alpha + tau*D + beta*X from all available data
@@ -459,5 +459,5 @@ ax.text(0.5, -0.22, "Orange points = Non-Premium (control). Blue points = Premiu
         transform=ax.transAxes, ha="center", fontsize=9, color="grey")
 
 # plt.tight_layout()
-# plt.savefig("/Users/robsontigre/Desktop/everyday-causal-inference/images/common_support.png", dpi=300, bbox_inches="tight")
+# plt.savefig("images/common_support.png", dpi=300, bbox_inches="tight")
 # plt.close()

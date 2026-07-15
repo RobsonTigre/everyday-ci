@@ -25,3 +25,7 @@ venv/
 
 # Private working notes (never commit)
 tasks/
+
+# Reader-generated figures (keep the folder, ignore its contents)
+images/*
+!images/.gitkeep

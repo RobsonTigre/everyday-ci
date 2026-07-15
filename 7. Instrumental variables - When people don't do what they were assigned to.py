@@ -142,7 +142,7 @@ print(df.head())
 #########################################
 
 # Read data from csv
-df = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/daily_communications.csv")
+df = pd.read_csv("data/daily_communications.csv")
 
 # First stage: effect of invitation on daily email adoption
 X_first = df[['invitation', 'tenure_months', 'past_purchase', 'engagement_score']]

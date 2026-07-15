@@ -30,7 +30,7 @@ df_ads = pd.DataFrame({'sales': sales, 'ad_spend': ad_spend, 'holiday': holiday}
 # df_ads.to_csv('data/advertising_data.csv', index=False)
 
 # read the data from csv
-df = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/advertising_data.csv")
+df = pd.read_csv("data/advertising_data.csv")
 
 # fit and summarize simple regression model
 simple_regression = smf.ols('sales ~ ad_spend', data=df).fit()
@@ -73,7 +73,7 @@ df_ui = pd.DataFrame({'time_on_app': y, 'new_ui': new_ui, 'is_ios': is_ios,
                       'user_segment': user_segment, 'account_age': account_age})
 # df_ui.to_csv('data/tricky_coefficients.csv', index=False)
 
-df = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/tricky_coefficients.csv")
+df = pd.read_csv("data/tricky_coefficients.csv")
 m1 = smf.ols('time_on_app ~ new_ui', data=df).fit()
 print(m1.summary())
 
@@ -133,7 +133,7 @@ df_email = pd.DataFrame({'discount_email': discount_email, 'amount_spent': amoun
 # df_email.to_csv('data/email_campaign.csv', index=False)
 
 # read the data from csv
-df = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/email_campaign.csv")
+df = pd.read_csv("data/email_campaign.csv")
 
 # fit and summarize simple regression model
 model = smf.ols('amount_spent ~ discount_email', data=df).fit()
@@ -151,7 +151,7 @@ print(model.summary())
 ##################################
 
 # read the data from csv
-df = pd.read_csv("/Users/robsontigre/Desktop/everyday-ci/data/advertising_data.csv")
+df = pd.read_csv("data/advertising_data.csv")
 # calculate mean sales
 mean_sales = df['sales'].mean()
 print(mean_sales) # R$266.44

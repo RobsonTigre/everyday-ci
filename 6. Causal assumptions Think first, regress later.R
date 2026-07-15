@@ -85,10 +85,10 @@ ticket <- rbinom(n, 1, prob_tick)
 df <- data.frame(engagement, premium, user_activity, ad_free, ticket, age, marketing, shoe_size)
 
 # Saving data as CSV
-write.csv(df, "/Users/robsontigre/Desktop/everyday-ci/data/engagement.csv", row.names = FALSE)
+write.csv(df, "data/engagement.csv", row.names = FALSE)
 
 # Reading the data
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/engagement.csv")
+df <- read.csv("data/engagement.csv")
 
 # Helper function to extract estimate and SE
 get_coef <- function(m) summary(m)$coefficients["premium", c("Estimate", "Std. Error")]
@@ -160,10 +160,10 @@ revenue <- 50 + 8 * emails - 0.8 * emails^2 + rnorm(n, 0, 5)
 df <- data.frame(emails, revenue)
 
 # Save to CSV for reproducibility
-write.csv(df, "/Users/robsontigre/Desktop/everyday-ci/data/email_frequency.csv", row.names = FALSE)
+write.csv(df, "data/email_frequency.csv", row.names = FALSE)
 
 # Read data
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/email_frequency.csv")
+df <- read.csv("data/email_frequency.csv")
 
 # Misspecified model: linear only
 model_linear <- lm(revenue ~ emails, data = df)
@@ -231,7 +231,7 @@ p_nonlinear <- ggplot(df, aes(x = emails, y = revenue)) +
     )
 
 # save figure
-ggsave("/Users/robsontigre/Desktop/everyday-causal-inference/images/ols_misspecification.png", p_nonlinear, width = 10, height = 7, dpi = 300)
+ggsave("images/ols_misspecification.png", p_nonlinear, width = 10, height = 7, dpi = 300)
 
 
 #########################################
@@ -267,10 +267,10 @@ sales <- ifelse(location == "high_traffic", 70, 35) +
 df <- data.frame(location, ad_spend, sales)
 
 # Save data as CSV
-write.csv(df, "/Users/robsontigre/Desktop/everyday-ci/data/simpsons_paradox.csv", row.names = FALSE)
+write.csv(df, "data/simpsons_paradox.csv", row.names = FALSE)
 
 # Read data
-df <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/simpsons_paradox.csv")
+df <- read.csv("data/simpsons_paradox.csv")
 
 # Aggregate analysis (wrong - shows NEGATIVE relationship!)
 model_aggregate <- lm(sales ~ ad_spend, data = df)
@@ -355,7 +355,7 @@ p_simpson <- ggplot(df, aes(x = ad_spend, y = sales)) +
     )
 
 # Save figure
-ggsave("/Users/robsontigre/Desktop/everyday-causal-inference/images/simpsons_paradox.png",
+ggsave("images/simpsons_paradox.png",
     p_simpson,
     width = 10, height = 7, dpi = 300
 )
@@ -402,10 +402,10 @@ df_overlap <- data.frame(
 )
 
 # Save data
-write.csv(df_overlap, "/Users/robsontigre/Desktop/everyday-ci/data/overlap_demo.csv", row.names = FALSE)
+write.csv(df_overlap, "data/overlap_demo.csv", row.names = FALSE)
 
 # Read the data
-df_overlap <- read.csv("/Users/robsontigre/Desktop/everyday-ci/data/overlap_demo.csv")
+df_overlap <- read.csv("data/overlap_demo.csv")
 
 # 5. FIT THE LINEAR MODEL
 # The model learns Y = alpha + tau*D + beta*X from all available data
@@ -520,7 +520,7 @@ p_overlap <- ggplot() +
     )
 
 # Save figure
-ggsave("/Users/robsontigre/Desktop/everyday-causal-inference/images/common_support.png",
+ggsave("images/common_support.png",
     p_overlap,
     width = 11, height = 8, dpi = 300
 )

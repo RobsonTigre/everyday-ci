@@ -48,10 +48,10 @@ df = pd.DataFrame({
 })
 
 # Save the simulated data
-# df.to_csv('/Users/robsontigre/Desktop/everyday-ci/data/personalized_feed_experiment.csv', index=False)
+# df.to_csv('data/personalized_feed_experiment.csv', index=False)
 
 # read the CSV file
-df = pd.read_csv('/Users/robsontigre/Desktop/everyday-ci/data/personalized_feed_experiment.csv')
+df = pd.read_csv('data/personalized_feed_experiment.csv')
 
 treatment_col = 'treatment'
 g1 = df[df[treatment_col] == 0]
