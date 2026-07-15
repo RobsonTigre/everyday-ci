@@ -6,8 +6,9 @@ This repository contains the companion code and data for the book *Everyday Caus
 
 ## What you may do
 
-- Read the book and run the code and data in this repository for personal, non-commercial learning.
-- Clone, fork, and download this repository through GitHub's standard features for that same personal, non-commercial learning. This does not grant any right to republish or redistribute the material outside GitHub.
+- Read the book and run the code and data in this repository for personal learning.
+- Use, modify, and adapt the code and data for your own analyses and professional projects, provided you give reasonable attribution where visible (e.g., "Based on examples from *Everyday Causal Inference* by Robson Tigre").
+- Clone, fork, and download this repository through GitHub's standard features for the permitted uses above. This does not grant any right to republish or redistribute the material outside GitHub.
 - Share official links to the book (https://www.everydaycausal.com/) or to this repository.
 - Cite short excerpts with proper attribution.
 

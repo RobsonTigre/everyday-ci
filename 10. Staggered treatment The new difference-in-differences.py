@@ -2,13 +2,16 @@
 ## Everyday Causal Inference: How to estimate, test, and explain impacts with R and Python
 ## www.everydaycausal.com
 ## Copyright (c) 2025 by Robson Tigre. All rights reserved.
-## You may read, share, and cite for learning purposes, provided you credit the source.
+## You may read, run, adapt, and cite this code, provided you credit the source.
 ## It should not be used to create competing educational or commercial products
 ##########################################################
 ## Code for Chapter 10 - Staggered treatment: The new difference-in-differences
 ## Created: May 08, 2026
 ## Last modified: 2026-05-18
 ##########################################################
+
+# If you haven't already, run this in your terminal to install the packages:
+# pip install matplotlib numpy pandas seaborn diff-diff linearmodels
 
 import warnings
 

@@ -22,3 +22,6 @@ venv/
 # System & Other
 .DS_Store
 .quarto/
+
+# Private working notes (never commit)
+tasks/

@@ -62,4 +62,4 @@ If you use this material in your work, please cite:
 
 ## Legal notice
 
-Copyright © 2025 by Robson Tigre. All rights reserved. You are welcome to clone this repository and run the code and data for personal learning, but not to redistribute the material or use it to train AI systems. See [LICENSE.md](LICENSE.md) for the full terms and the [legal notice](https://www.everydaycausal.com/legal.html) for details.
+Copyright © 2025 by Robson Tigre. All rights reserved. You are welcome to clone this repository, run the code and data for personal learning, and adapt the code for your own professional projects with attribution — but not to redistribute the material or use it to train AI systems. See [LICENSE.md](LICENSE.md) for the full terms and the [legal notice](https://www.everydaycausal.com/legal.html) for details.

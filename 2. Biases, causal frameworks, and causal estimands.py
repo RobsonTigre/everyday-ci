@@ -2,13 +2,16 @@
 ## Everyday Causal Inference: How to estimate, test, and explain impacts with R and Python
 ## www.everydaycausal.com
 ## Copyright © 2025 by Robson Tigre. All rights reserved.
-## You may read, share, and cite for learning purposes, provided you credit the source.
+## You may read, run, adapt, and cite this code, provided you credit the source.
 ## It should not be used to create competing educational or commercial products
 ##########################################################
 ## Code for Chapter 2 - Biases, causal frameworks, and causal estimands
 ## Created: Dec 18, 2025
 ## Last modified: Dec 19, 2025
 ##########################################################
+
+# If you haven't already, run this in your terminal to install the packages:
+# pip install pandas numpy statsmodels
 
 import pandas as pd # Data manipulation
 import numpy as np # Mathematical computing in Python

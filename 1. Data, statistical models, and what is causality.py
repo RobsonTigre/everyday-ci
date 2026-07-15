@@ -2,7 +2,7 @@
 ## Everyday Causal Inference: How to estimate, test, and explain impacts with R and Python 
 ## www.everydaycausal.com
 ## Copyright © 2025 by Robson Tigre. All rights reserved. 
-## You may read, share, and cite for learning purposes, provided you credit the source.
+## You may read, run, adapt, and cite this code, provided you credit the source.
 ## It should not be used to create competing educational or commercial products
 ##########################################################
 ## Code for Chapter 1 - Data, statistical models, and ‘what is causality’
@@ -13,6 +13,9 @@
 #########################################
 # Creating advertising data and example
 #########################################
+# If you haven't already, run this in your terminal to install the packages:
+# pip install pandas numpy statsmodels
+
 import pandas as pd
 import numpy as np
 import statsmodels.formula.api as smf
