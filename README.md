@@ -21,10 +21,18 @@ All datasets used in the book are available in the [data folder](https://github.
 https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/<filename>.csv
 ```
 
+## Companion AI plugin: Everyday Causal Skills
+
+The book has an optional companion, [everyday-causal-skills](https://github.com/RobsonTigre/everyday-causal-skills) — a free plugin that gives your AI coding agent (Claude Code, Gemini CLI, GitHub Copilot CLI, Codex CLI, or Cursor) the workflow taught in the book: describe your causal question in plain language, get a method recommendation, check the assumptions, write the analysis in R or Python, stress-test the results, and compile a report.
+
+You don't need it to follow the book. But if you want extra hands-on practice — for example, `/causal-exercises` generates practice problems with simulated data and known ground truth — head to the [everyday-causal-skills repository](https://github.com/RobsonTigre/everyday-causal-skills) for installation instructions and worked examples.
+
 ## Contribute and stay updated
 
 - ⭐ **Star this repo** to signal interest and get updates.
 - 🔔 **Follow the [author](https://www.linkedin.com/in/robson-tigre/)** for weekly posts on causal inference.
+- 🌐 **Contact:** Reach me through my [website](https://www.robsontigre.com/) or socials.
+- ✍️ **Read more:** Longer-form posts on [Substack](https://robsontigre.substack.com/) and [Medium](https://medium.com/@robson.tigre0).
 - 📬 **[Subscribe](https://tally.so/r/0Q7z7P)** to be notified when new content is released.
 - 🚩 **Feedback:** Found an error or have a suggestion? [Submit feedback here](https://tally.so/r/obbx0V).
 
