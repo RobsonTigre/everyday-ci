@@ -13,7 +13,7 @@
 # Setup -------------------------------------------------------------------
 # Install packages if needed:
 # pip install git+https://github.com/RobsonTigre/pycausalarima.git
-# pip install causalimpact
+# pip install pycausalimpact "pandas<3"
 
 import pandas as pd
 import numpy as np
