@@ -1,6 +1,11 @@
 # R dependencies for the Everyday Causal Inference code examples
 # Run with: Rscript install.R   (or source("install.R") from an R session)
 
+# Use the official CRAN cloud mirror if none is configured (required for Rscript)
+if (getOption("repos")["CRAN"] %in% c(NA, "@CRAN@")) {
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+}
+
 install.packages(c(
   "tidyverse",
   "fixest",
