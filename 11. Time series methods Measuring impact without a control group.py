@@ -12,7 +12,7 @@
 
 # Setup -------------------------------------------------------------------
 # Install packages if needed:
-# pip install git+https://github.com/RobsonTigre/pycausalarima.git
+# pip install pycausalarima  # needs Python >= 3.10
 # pip install pycausalimpact "pandas<3"
 
 import pandas as pd

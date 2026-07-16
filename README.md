@@ -25,7 +25,7 @@ https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/<filename>.c
 
 To install every package used across the book's code examples in one go:
 
-**Python** (tested with 3.9+):
+**Python** (tested with 3.9+; chapter 11's `pycausalarima` needs 3.10+ and is skipped automatically on older versions):
 
 ```bash
 pip install -r requirements.txt

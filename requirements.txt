@@ -12,4 +12,4 @@ diff-diff
 rdrobust
 rddensity
 pycausalimpact
-pycausalarima @ git+https://github.com/RobsonTigre/pycausalarima.git ; python_version >= "3.10"
+pycausalarima ; python_version >= "3.10"
