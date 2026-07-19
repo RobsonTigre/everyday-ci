@@ -22,7 +22,10 @@ install.packages(c(
   "CausalImpact",
   "skimr",
   "gridExtra",
-  "patchwork"
+  "patchwork",
+  "grf",
+  "policytree",
+  "DiagrammeR"  # policytree suggests it
 ))
 
 # CausalArima is not on CRAN; install it from GitHub

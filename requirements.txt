@@ -7,8 +7,11 @@ scipy
 matplotlib
 seaborn
 statsmodels
+scikit-learn
 linearmodels
 diff-diff
+econml
+mcf
 rdrobust
 rddensity
 pycausalimpact
