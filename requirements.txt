@@ -11,7 +11,7 @@ scikit-learn
 linearmodels
 diff-diff
 econml
-mcf
+mcf  # only mcf 0.10.0+ needs Python 3.12+; pip picks an older compatible release below that
 rdrobust
 rddensity
 pycausalimpact

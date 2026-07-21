@@ -11,10 +11,9 @@
 ##########################################################
 
 # Setup -------------------------------------------------------------------
-# Install packages if needed:
-# install.packages("devtools", dependencies = TRUE)
-# install.packages("tidybayes", dependencies = TRUE)
-# devtools::install_github("FMenchetti/CausalArima", dependencies = TRUE)
+# Install packages if needed (CausalArima is not on CRAN; get it from GitHub):
+# if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+# remotes::install_github("FMenchetti/CausalArima", dependencies = TRUE)
 
 library(tidyverse)
 library(forecast)
