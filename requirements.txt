@@ -12,6 +12,7 @@ linearmodels
 diff-diff
 econml
 mcf  # only mcf 0.10.0+ needs Python 3.12+; pip picks an older compatible release below that
+psutil  # mcf imports this at load time (mcf_general_sys.py) but doesn't declare it as a dependency; without it, ch12's mcf import crashes with ModuleNotFoundError
 rdrobust
 rddensity
 pycausalimpact

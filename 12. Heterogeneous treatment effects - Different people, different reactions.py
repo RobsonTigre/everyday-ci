@@ -12,7 +12,7 @@
 
 # Setup -------------------------------------------------------------------
 # Install packages if needed:
-# pip install pandas numpy scipy statsmodels matplotlib econml scikit-learn mcf
+# pip install pandas numpy scipy statsmodels matplotlib econml scikit-learn mcf psutil
 
 import numpy as np
 import pandas as pd
