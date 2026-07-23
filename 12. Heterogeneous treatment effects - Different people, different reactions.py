@@ -12,8 +12,10 @@
 
 # Setup -------------------------------------------------------------------
 # Install packages if needed:
-# pip install pandas numpy scipy statsmodels matplotlib econml scikit-learn mcf psutil
+# pip install pandas numpy scipy statsmodels matplotlib econml scikit-learn mcf==0.6.0 psutil
 
+import os
+import tempfile
 import numpy as np
 import pandas as pd
 import matplotlib
@@ -484,7 +486,7 @@ def _solve_policy(depth, **extra):
         # (its default, made explicit): the search is exhaustive over that grid,
         # not over every continuous split value.
         pt_no_of_evalupoints=100,
-        gen_outpath=f"/tmp/mcf_coupon_d{depth}", **extra,
+        gen_outpath=os.path.join(tempfile.gettempdir(), f"mcf_coupon_d{depth}"), **extra,
     )
     return optp.solve(pdf, data_title="coupon")
 

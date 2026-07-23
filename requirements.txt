@@ -11,7 +11,7 @@ scikit-learn
 linearmodels
 diff-diff
 econml
-mcf  # only mcf 0.10.0+ needs Python 3.12+; pip picks an older compatible release below that
+mcf==0.6.0  # pinned: Chapter 12's Python policy-tree timing/output is documented as produced with this version; 0.8.0+ renames the module the script imports from (optpolicy_functions -> optpolicy_main), breaking the import
 psutil  # mcf imports this at load time (mcf_general_sys.py) but doesn't declare it as a dependency; without it, ch12's mcf import crashes with ModuleNotFoundError
 rdrobust
 rddensity

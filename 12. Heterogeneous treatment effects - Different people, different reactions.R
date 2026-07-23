@@ -452,9 +452,11 @@ ggsave("images/coupon-tree-to-forest.png", pC, width = 8.5, height = 5.5, dpi = 
 Gamma <- cbind("No coupon" = 0, "Coupon" = df$cate_forest - cfg$coupon_cost)
 ptree <- policy_tree(X, Gamma, depth = 2, min.node.size = 1000)  # broad, stable leaves
 
-## plot.policy_tree needs DiagrammeR (absent); render any tree shape with a
-## recursive base-R layout (x by leaf order, y by depth) -- policytree numbers
-## nodes sequentially, so positions must follow the actual left/right children.
+## Custom base-R renderer instead of plot.policy_tree's built-in DiagrammeR
+## widget: this needs an exact-resolution static PNG in book_colors matching
+## every other chapter figure, which plot.policy_tree doesn't expose. Layout
+## (x by leaf order, y by depth) follows policytree's sequential node
+## numbering, so positions must track the actual left/right children.
 plot_policy_tree_base <- function(pt, file, title) {
   nodes <- pt$nodes; feat <- pt$columns; acts <- pt$action.names
   xpos <- numeric(length(nodes)); ypos <- numeric(length(nodes)); leaf_n <- 0
