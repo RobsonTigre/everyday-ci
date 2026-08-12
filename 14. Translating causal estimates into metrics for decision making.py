@@ -5,7 +5,7 @@
 ## You may read, run, adapt, and cite this code, provided you credit the source.
 ## It should not be used to create competing educational or commercial products
 ##########################################################
-## Code for Chapter 13 - Translating causal estimates into metrics of business value
+## Code for Chapter 14 - Translating causal estimates into metrics of business value
 ## Created: Mar 06, 2026
 ## Last modified: 2026-05-07
 ##########################################################
