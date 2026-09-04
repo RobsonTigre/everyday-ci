@@ -29,3 +29,5 @@ tasks/
 # Reader-generated figures (keep the folder, ignore its contents)
 images/*
 !images/.gitkeep
+everyday-ci-audit/
+everyday-ci-fix/
