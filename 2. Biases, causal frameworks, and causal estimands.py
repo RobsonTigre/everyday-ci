@@ -24,8 +24,9 @@ n = 800
 engagement = np.random.normal(loc=8, scale=3, size=n) # user time on app, in minutes
 
 # Recommendations shown: strongly correlated with engagement (more time = more shown)
-# Note: lambda must be non-negative. In this simulation parameters are chosen so it stays positive.
-recommendations_shown = np.random.poisson(lam=2 + 1.5 * engagement)
+# The Poisson rate must be non-negative, so we clamp it at 0: a low engagement draw can
+# otherwise push 2 + 1.5*engagement below zero, which np.random.poisson rejects with an error.
+recommendations_shown = np.random.poisson(lam=np.maximum(2 + 1.5 * engagement, 0))
 
 # Total R$ spent: strongly related to engagement, weakly of recommendations
 total_spent = np.random.normal(

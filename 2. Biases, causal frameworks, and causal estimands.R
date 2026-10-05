@@ -23,7 +23,9 @@ n <- 800
 engagement <- rnorm(n, mean = 8, sd = 3) # user time on app, in minutes
 
 # Recommendations shown: strongly correlated with engagement (more time = more shown)
-recommendations_shown <- rpois(n, lambda = 2 + 1.5 * engagement)
+# Clamp the Poisson rate at 0: a low engagement draw can push 2 + 1.5*engagement below zero,
+# and rpois() would then return NA (with only a warning) instead of failing loudly.
+recommendations_shown <- rpois(n, lambda = pmax(2 + 1.5 * engagement, 0))
 
 # Total R$ spent: strongly related to engagement, weakly of recommendations
 total_spent <- rnorm(
