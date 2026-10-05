@@ -51,9 +51,9 @@ options(scipen = 999)
 
 df <- read.csv("data/personalized_feed_experiment.csv")
 
-# balance table between treatment and control groups with t-tests for all variables
+# balance table for pre-treatment covariates
 balance_table <- balance_table(
-    data = df,
+    data = df[, c("treatment", "pre_profit", "prior_purchases", "user_tenure")],
     treatment = "treatment"
 )
 print(balance_table)
@@ -62,9 +62,7 @@ print(balance_table)
 #   <chr>                    <dbl>       <dbl>    <dbl>
 # 1 pre_profit               22.6        22.5  8.43e- 1
 # 2 prior_purchases           4.98        5.01 7.14e- 1
-# 3 profit_30d               22.8        25.2  7.70e-15
-# 4 user_id                2516.       2484.   4.34e- 1
-# 5 user_tenure              18.8        18.3  9.09e- 2
+# 3 user_tenure              18.8        18.3  9.09e- 2
 
 # main result
 main <- lm(profit_30d ~ treatment, data = df)

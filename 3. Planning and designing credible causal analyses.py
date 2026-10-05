@@ -57,7 +57,7 @@ treatment_col = 'treatment'
 g1 = df[df[treatment_col] == 0]
 g2 = df[df[treatment_col] == 1]
 
-# balance table between treatment and control groups with t-tests for all variables
+# balance table for pre-treatment covariates
 balance_table = pd.DataFrame([
     {
         'variable': col,
@@ -66,16 +66,14 @@ balance_table = pd.DataFrame([
         't-stat': ttest_ind(g1[col].dropna(), g2[col].dropna()).statistic,
         'p-value': ttest_ind(g1[col].dropna(), g2[col].dropna()).pvalue
     }
-    for col in df.select_dtypes(include='number').columns if col != treatment_col
+    for col in ['pre_profit', 'prior_purchases', 'user_tenure']
 ])
 print(balance_table)
 
 #           variable  mean_control   mean_treat    t-stat       p-value
-# 0          user_id   2516.133177  2484.189620  0.782170  4.341519e-01
-# 1       pre_profit     22.559131    22.493381  0.197934  8.431046e-01
-# 2  prior_purchases      4.983549     5.006539 -0.365745  7.145705e-01
-# 3      user_tenure     18.770466    18.275439  1.691283  9.084507e-02
-# 4       profit_30d     22.846601    25.189634 -7.801984  7.368280e-15
+# 0       pre_profit     22.559131    22.493381  0.197934  8.431046e-01
+# 1  prior_purchases      4.983549     5.006539 -0.365745  7.145705e-01
+# 2      user_tenure     18.770466    18.275439  1.691283  9.084507e-02
 
 main = smf.ols('profit_30d ~ treatment', data=df).fit()
 print(main.summary())
