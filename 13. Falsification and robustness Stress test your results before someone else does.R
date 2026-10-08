@@ -354,7 +354,7 @@ report_regression("initial adjusted placebo in time", placebo_time)
 # ==========================================================
 # NEGATIVE-CONTROL OUTCOMES: an effect where the banner cannot reach
 # ==========================================================
-# Swap the outcome for spend in categories the free-shipping offer does not
+# Swap the outcome for profit from categories the free-shipping offer does not
 # apply to. The banner has no mechanism to move it, so treated should be ~0.
 # It is not: negative-control association from the initial adjusted model = R$1.11 [R$0.95, R$1.28].
 
