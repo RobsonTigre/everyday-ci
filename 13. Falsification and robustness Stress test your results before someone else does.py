@@ -126,17 +126,17 @@ def report_correlation(label, x, y):
 CORE = "treated + prior_orders + prior_profit + sessions_pre"
 
 # ==========================================================
-# ANALYSIS STAGES: the raw comparison and the intermediate core model
+# ANALYSIS STAGES: the raw comparison and the initial adjusted model
 # ==========================================================
 # The two numbers the chapter opens with, and the simulated truths they are
 # graded against. Both interval rows use classical (homoskedastic) standard
 # errors; every diagnostic below uses HC1 unless it says otherwise.
 
 report_classical("raw comparison", smf.ols("profit_30d ~ treated", df).fit())
-report_classical("intermediate core controls",
+report_classical("initial adjusted model",
                  smf.ols(f"profit_30d ~ {CORE}", df).fit())
 # raw comparison: estimate = 7.8558; classical SE = 0.1373; 95% Student-t CI = [7.5867, 8.1249]
-# intermediate core controls: estimate = 2.1866; classical SE = 0.1331; 95% Student-t CI = [1.9257, 2.4475]
+# initial adjusted model: estimate = 2.1866; classical SE = 0.1331; 95% Student-t CI = [1.9257, 2.4475]
 
 # Simulated truths. true_effect_proxy is the per-user ground truth that ships
 # in the public CSV; the latent confounder itself never does.
@@ -154,26 +154,26 @@ print("ineligible-targeted truth=",
 # PLACEBO IN TIME: a "fake effect" before the banner existed
 # ==========================================================
 # The banner cannot have changed anything before it launched. Swap the
-# outcome for the pre-period profit and re-run the intermediate spec; the
+# outcome for the pre-period profit and re-run the initial adjusted specification; the
 # 'treated' coefficient should be ~0 if the comparison is clean.
-# It is not: intermediate placebo-in-time = R$1.59 [R$1.32, R$1.86].
+# It is not: adjusted pre-period profit difference from the initial adjusted model = R$1.59 [R$1.32, R$1.86].
 
 placebo_time = smf.ols(f"profit_pre ~ {CORE}", data=df).fit(cov_type="HC1")
-report_regression("intermediate placebo in time", placebo_time)
-# intermediate placebo in time: estimate = 1.5918; HC1 SE = 0.1366; 95% Student-t CI = [1.3239, 1.8596]
+report_regression("initial adjusted placebo in time", placebo_time)
+# initial adjusted placebo in time: estimate = 1.5918; HC1 SE = 0.1366; 95% Student-t CI = [1.3239, 1.8596]
 
 # ==========================================================
 # NEGATIVE-CONTROL OUTCOMES: an effect where the banner cannot reach
 # ==========================================================
 # Swap the outcome for spend in categories the free-shipping offer does not
 # apply to. The banner has no mechanism to move it, so treated should be ~0.
-# It is not: intermediate negative-control = R$1.11 [R$0.95, R$1.28].
+# It is not: negative-control association from the initial adjusted model = R$1.11 [R$0.95, R$1.28].
 
 negctrl = smf.ols(
     f"noneligible_category_profit ~ {CORE}", data=df
 ).fit(cov_type="HC1")
-report_regression("intermediate negative control", negctrl)
-# intermediate negative control: estimate = 1.1148; HC1 SE = 0.0838; 95% Student-t CI = [0.9505, 1.2791]
+report_regression("initial adjusted negative control", negctrl)
+# initial adjusted negative control: estimate = 1.1148; HC1 SE = 0.0838; 95% Student-t CI = [0.9505, 1.2791]
 
 # ==========================================================
 # PLACEBO TREATMENTS: an effect from an assignment that did nothing
@@ -223,15 +223,15 @@ report_regression("score-preserving fake exposure", score_fit, "fake_score_expos
 # ==========================================================
 # shipping_eligible == 0 users cannot redeem free shipping, so their true
 # banner effect is R$0.00 by construction. A design that removes selection
-# should return roughly zero for their banner contrast.
+# should return roughly zero for their adjusted profit difference.
 
 ineligible = df[df["shipping_eligible"] == 0].copy()
 
 # 1) The observational estimator on the placebo units.
 #    Need NOT be zero: selection still operates among the ineligible.
 obs_placebo = smf.ols(f"profit_30d ~ {CORE}", data=ineligible).fit(cov_type="HC1")
-report_regression("ineligible observational contrast", obs_placebo)
-# ineligible observational contrast: estimate = 1.1231; HC1 SE = 0.2146; 95% Student-t CI = [0.7025, 1.5437]
+report_regression("adjusted profit difference among ineligible users (initial adjusted model)", obs_placebo)
+# adjusted profit difference among ineligible users (initial adjusted model): estimate = 1.1231; HC1 SE = 0.2146; 95% Student-t CI = [0.7025, 1.5437]
 
 # 2) Permutation calibration: fake the assignment within a group
 #    that cannot benefit, and see how often we reject the null.
@@ -336,7 +336,7 @@ implications = [
     ("prior_orders _||_ prior_profit", "prior_orders", "prior_profit", set()),
     ("prior_orders _||_ sessions_pre", "prior_orders", "sessions_pre", set()),
     ("prior_profit _||_ sessions_pre", "prior_profit", "sessions_pre", set()),
-    ("predicted_purchase_score _||_ profit_30d after intermediate conditioning",
+    ("predicted_purchase_score _||_ profit_30d after adjustment for the initial model's regressors",
      "predicted_purchase_score", "profit_30d", {"treated", *roots}),
 ]
 for label, left, right, given in implications:
@@ -355,20 +355,20 @@ ctrl = CORE
 r_score  = smf.ols(f"predicted_purchase_score ~ {ctrl}", data=df).fit().resid
 r_profit = smf.ols(f"profit_30d ~ {ctrl}", data=df).fit().resid
 
-report_correlation("predicted_purchase_score _||_ profit_30d after intermediate conditioning",
+report_correlation("predicted_purchase_score _||_ profit_30d after adjustment for the initial model's regressors",
                    r_score, r_profit)
 # prior_orders _||_ prior_profit: Pearson r = 0.7343; 95% Fisher CI = [0.7290, 0.7395]
 # prior_orders _||_ sessions_pre: Pearson r = 0.2166; 95% Fisher CI = [0.2058, 0.2274]
 # prior_profit _||_ sessions_pre: Pearson r = 0.3655; 95% Fisher CI = [0.3557, 0.3753]
-# predicted_purchase_score _||_ profit_30d after intermediate conditioning: Pearson r = 0.1188; 95% Fisher CI = [0.1076, 0.1300]
+# predicted_purchase_score _||_ profit_30d after adjustment for the initial model's regressors: Pearson r = 0.1188; 95% Fisher CI = [0.1076, 0.1300]
 
 # ==========================================================
-# ALIGN THE FOCAL MODEL WITH THE TARGETED-USER ATT
+# ADD THE ELIGIBILITY INTERACTION AND AVERAGE OVER TARGETED USERS
 # ==========================================================
-# The intermediate model assumes one constant effect even though eligibility
-# determines whether free shipping can matter. Add treated * eligibility,
+# The initial adjusted model uses one treatment coefficient for both groups.
+# Add shipping eligibility and its interaction with treatment,
 # centered so the 'treated' coefficient reads as the targeted-population
-# contrast: R$1.87 [R$1.60, R$2.13] with HC1.
+# estimate: R$1.87 [R$1.60, R$2.13] with HC1.
 
 treated_eligibility_share = df.loc[
     df["treated"] == 1, "shipping_eligible"
@@ -376,62 +376,62 @@ treated_eligibility_share = df.loc[
 df["eligibility_centered"] = (
     df["shipping_eligible"] - treated_eligibility_share
 )
-FOCAL_RHS = ("treated * eligibility_centered + "
+INTERACTION_RHS = ("treated * eligibility_centered + "
              "prior_orders + prior_profit + sessions_pre")
 
-focal = smf.ols(f"profit_30d ~ {FOCAL_RHS}", data=df).fit(cov_type="HC1")
-report_regression("focal targeted-standardized contrast", focal)
-# focal targeted-standardized contrast: estimate = 1.8657; HC1 SE = 0.1341; 95% Student-t CI = [1.6028, 2.1285]
+interaction_model = smf.ols(f"profit_30d ~ {INTERACTION_RHS}", data=df).fit(cov_type="HC1")
+report_regression("Interaction model", interaction_model)
+# Interaction model: estimate = 1.8657; HC1 SE = 0.1341; 95% Student-t CI = [1.6028, 2.1285]
 
-raw = smf.ols(
+uncentered_model = smf.ols(
     "profit_30d ~ treated * shipping_eligible "
     "+ prior_orders + prior_profit + sessions_pre",
     data=df,
 ).fit(cov_type="HC1")
 # Both parameterizations are the same fit with different labels.
-assert (focal.fittedvalues - raw.fittedvalues).abs().max() < 1e-9
+assert (interaction_model.fittedvalues - uncentered_model.fittedvalues).abs().max() < 1e-9
 df["ineligibility"] = 1 - df["shipping_eligible"]
-raw_eligible = smf.ols(
+eligible_parameterization_model = smf.ols(
     "profit_30d ~ treated * ineligibility "
     "+ prior_orders + prior_profit + sessions_pre",
     data=df,
 ).fit(cov_type="HC1")
-report_regression("raw ineligible-user contrast", raw)
-report_regression("raw treatment-by-eligibility interaction", raw,
+report_regression("adjusted profit difference among ineligible users (interaction model)", uncentered_model)
+report_regression("uncentered treatment-by-eligibility interaction", uncentered_model,
                   "treated:shipping_eligible")
-report_regression("raw eligible-user contrast", raw_eligible)
-# raw ineligible-user contrast: estimate = 1.2491; HC1 SE = 0.2006; 95% Student-t CI = [0.8558, 1.6423]
-# raw treatment-by-eligibility interaction: estimate = 0.9353; HC1 SE = 0.2444; 95% Student-t CI = [0.4563, 1.4143]
-# raw eligible-user contrast: estimate = 2.1844; HC1 SE = 0.1638; 95% Student-t CI = [1.8634, 2.5054]
+report_regression("adjusted profit difference among eligible users", eligible_parameterization_model)
+# adjusted profit difference among ineligible users (interaction model): estimate = 1.2491; HC1 SE = 0.2006; 95% Student-t CI = [0.8558, 1.6423]
+# uncentered treatment-by-eligibility interaction: estimate = 0.9353; HC1 SE = 0.2444; 95% Student-t CI = [0.4563, 1.4143]
+# adjusted profit difference among eligible users: estimate = 2.1844; HC1 SE = 0.1638; 95% Student-t CI = [1.8634, 2.5054]
 
 # ==========================================================
-# FOCAL RECHECK: rerun every applicable diagnostic on the focal model
+# INTERACTION-SPECIFICATION RECHECK: rerun every applicable diagnostic
 # ==========================================================
 # The placebo-treatment rows add the placebo indicator as one more regressor
-# on the focal right-hand side. Placebo-in-time and negative-control keep the
-# focal specification and swap only the outcome. The ineligible placebo-unit
-# recheck is the "raw ineligible-user contrast" printed just above: the same
-# fitted model written with raw shipping_eligible instead of the centered
-# version, which reads the contrast at eligibility zero.
+# on the interaction right-hand side. Placebo-in-time and negative-control keep the
+# interaction specification and swap only the outcome. The ineligible placebo-unit
+# recheck is the "adjusted profit difference among ineligible users (interaction model)" printed just above: the same
+# fitted model written with uncentered shipping_eligible instead of the centered
+# version, which gives the adjusted profit difference for ineligible users.
 
-report_regression("focal placebo in time",
-                  smf.ols(f"profit_pre ~ {FOCAL_RHS}", df).fit(cov_type="HC1"))
-report_regression("focal negative control",
-                  smf.ols(f"noneligible_category_profit ~ {FOCAL_RHS}", df).fit(cov_type="HC1"))
-report_regression("focal deterministic null",
-                  smf.ols(f"profit_30d ~ placebo_null + {FOCAL_RHS}", df).fit(cov_type="HC1"),
+report_regression("placebo in time using the interaction model",
+                  smf.ols(f"profit_pre ~ {INTERACTION_RHS}", df).fit(cov_type="HC1"))
+report_regression("negative control using the interaction model",
+                  smf.ols(f"noneligible_category_profit ~ {INTERACTION_RHS}", df).fit(cov_type="HC1"))
+report_regression("deterministic null using the interaction model",
+                  smf.ols(f"profit_30d ~ placebo_null + {INTERACTION_RHS}", df).fit(cov_type="HC1"),
                   "placebo_null")
-report_regression("focal score-preserving fake exposure",
-                  smf.ols(f"profit_30d ~ fake_score_exposure + {FOCAL_RHS}", df).fit(cov_type="HC1"),
+report_regression("score-preserving fake exposure using the interaction model",
+                  smf.ols(f"profit_30d ~ fake_score_exposure + {INTERACTION_RHS}", df).fit(cov_type="HC1"),
                   "fake_score_exposure")
-report_correlation("predicted_purchase_score _||_ profit_30d after focal conditioning",
-                   smf.ols(f"predicted_purchase_score ~ {FOCAL_RHS}", df).fit().resid,
-                   smf.ols(f"profit_30d ~ {FOCAL_RHS}", df).fit().resid)
-# focal placebo in time: estimate = 1.6037; HC1 SE = 0.1384; 95% Student-t CI = [1.3325, 1.8750]
-# focal negative control: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
-# focal deterministic null: estimate = -0.0507; HC1 SE = 0.1187; 95% Student-t CI = [-0.2835, 0.1820]
-# focal score-preserving fake exposure: estimate = 1.3766; HC1 SE = 0.1828; 95% Student-t CI = [1.0182, 1.7349]
-# predicted_purchase_score _||_ profit_30d after focal conditioning: Pearson r = 0.1058; 95% Fisher CI = [0.0946, 0.1170]
+report_correlation("predicted_purchase_score _||_ profit_30d after adjustment for the interaction model's regressors",
+                   smf.ols(f"predicted_purchase_score ~ {INTERACTION_RHS}", df).fit().resid,
+                   smf.ols(f"profit_30d ~ {INTERACTION_RHS}", df).fit().resid)
+# placebo in time using the interaction model: estimate = 1.6037; HC1 SE = 0.1384; 95% Student-t CI = [1.3325, 1.8750]
+# negative control using the interaction model: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
+# deterministic null using the interaction model: estimate = -0.0507; HC1 SE = 0.1187; 95% Student-t CI = [-0.2835, 0.1820]
+# score-preserving fake exposure using the interaction model: estimate = 1.3766; HC1 SE = 0.1828; 95% Student-t CI = [1.0182, 1.7349]
+# predicted_purchase_score _||_ profit_30d after adjustment for the interaction model's regressors: Pearson r = 0.1058; 95% Fisher CI = [0.0946, 0.1170]
 
 # ==========================================================
 # ROBUSTNESS GRID: six defensible specifications, one lever at a time
@@ -440,31 +440,31 @@ report_correlation("predicted_purchase_score _||_ profit_30d after focal conditi
 # trimming, ATT weighting, and 1:1 nearest-neighbour matching -- read this
 # grid for effect-size stability, never as an average.
 
-core_rhs = FOCAL_RHS
-ctx_rhs = core_rhs + " + tenure_days + C(loyalty_tier) + C(region) + C(device)"
+interaction_rhs = INTERACTION_RHS
+ctx_rhs = interaction_rhs + " + tenure_days + C(loyalty_tier) + C(region) + C(device)"
 
-adjusted = smf.ols(f"profit_30d ~ {core_rhs}", df).fit(cov_type="HC1")
+interaction_model = smf.ols(f"profit_30d ~ {interaction_rhs}", df).fit(cov_type="HC1")
 context  = smf.ols(f"profit_30d ~ {ctx_rhs}", df).fit(cov_type="HC1")
 score    = smf.ols(f"profit_30d ~ {ctx_rhs} + predicted_purchase_score", df).fit(cov_type="HC1")
 
-# Trim to common support on the targeting score, then re-fit the core spec.
+# Trim to common support on the targeting score, then re-fit the interaction specification.
 score_t, score_c = df.loc[df.treated == 1, "predicted_purchase_score"], \
                    df.loc[df.treated == 0, "predicted_purchase_score"]
 cs_lo, cs_hi = max(score_t.min(), score_c.min()), min(score_t.max(), score_c.max())
 df_trim = df[df.predicted_purchase_score.between(cs_lo, cs_hi)]
-trimmed = smf.ols(f"profit_30d ~ {core_rhs}", df_trim).fit(cov_type="HC1")
+trimmed = smf.ols(f"profit_30d ~ {interaction_rhs}", df_trim).fit(cov_type="HC1")
 
 # Formula-based unpenalized binomial GLM for IPW and matching.
 ps_model2 = smf.glm(PROPENSITY, data=df,
                    family=sm.families.Binomial()).fit()
 ps = ps_model2.predict(df)
 wt = np.where(df["treated"] == 1, 1.0, ps / (1 - ps))
-ipw = smf.wls(f"profit_30d ~ {core_rhs}", df, weights=wt).fit(cov_type="HC1")
+ipw = smf.wls(f"profit_30d ~ {interaction_rhs}", df, weights=wt).fit(cov_type="HC1")
 ipw_placebo_time = smf.wls(
-    f"profit_pre ~ {core_rhs}", df, weights=wt
+    f"profit_pre ~ {interaction_rhs}", df, weights=wt
 ).fit(cov_type="HC1")
 ipw_negative_control = smf.wls(
-    f"noneligible_category_profit ~ {core_rhs}", df, weights=wt
+    f"noneligible_category_profit ~ {interaction_rhs}", df, weights=wt
 ).fit(cov_type="HC1")
 
 # Match with replacement; keep each control once with its raw reuse count.
@@ -477,11 +477,11 @@ matched_controls2 = c_df.loc[control_rows2].copy()
 matched_controls2["match_weight"] = reuse2
 t_df = t_df.copy(); t_df["match_weight"] = 1
 matched_grid = pd.concat([t_df, matched_controls2])
-nn = smf.wls(f"profit_30d ~ {core_rhs}", matched_grid,
+nn = smf.wls(f"profit_30d ~ {interaction_rhs}", matched_grid,
              weights=matched_grid["match_weight"]).fit(cov_type="HC3")
 
 # Read the six targeted-standardized estimates; never duplicate reused controls.
-for name, m in [("adjusted", adjusted), ("context", context),
+for name, m in [("Interaction model", interaction_model), ("context", context),
                 ("score", score), ("trimmed", trimmed), ("ipw", ipw),
                 ("nn", nn)]:
     covariance = "HC3" if name == "nn" else "HC1"
@@ -499,25 +499,25 @@ print(
 # IPW noneligible-category placebo: estimate = 0.3902; HC1 SE = 0.1047; 95% Student-t CI = [0.1849, 0.5955]
 # common-support trim: 18 rows removed; 10 treated removed; targeted truth = 0.987911
 
-# Changing the population changes the question. Restricting the core model to
+# Changing the population changes the question. Restricting the initial adjusted model to
 # shipping-eligible users is graded against the eligible-targeted truth
 # (R$1.50), not the R$0.99 truth for all targeted users, so it is NOT part of
-# the six-specification same-population grid above.
-report_regression("eligible-only core",
+# the six-specification grid with the full-sample treated eligibility mix fixed above.
+report_regression("eligible-only initial adjusted",
                   smf.ols(f"profit_30d ~ {CORE}",
                           df[df.shipping_eligible == 1]).fit(cov_type="HC1"))
-# eligible-only core: estimate = 2.2664; HC1 SE = 0.1707; 95% Student-t CI = [1.9317, 2.6010]
+# eligible-only initial adjusted: estimate = 2.2664; HC1 SE = 0.1707; 95% Student-t CI = [1.9317, 2.6010]
 
 # ==========================================================
 # SENSITIVITY TO UNOBSERVED CONFOUNDING
 # ==========================================================
-# The focal model still rests on the assumption that observed controls
+# The interaction model still rests on the assumption that observed controls
 # capture the selection the targeting system acted on. Sensitivity
 # analysis bounds how strong a hidden confounder would have to be to
 # overturn the result. PySensemakr installs as PySensemakr but imports as
 # sensemakr.
 
-model_sens = smf.ols(f"profit_30d ~ {FOCAL_RHS}", data=df).fit()
+model_sens = smf.ols(f"profit_30d ~ {INTERACTION_RHS}", data=df).fit()
 
 # Sensitivity of the `treated` coefficient, benchmarked against the
 # strongest observed control, prior_profit.
@@ -563,17 +563,17 @@ rv = 0.5 * (np.sqrt(f_stat**4 + 4 * f_stat**2) - f_stat**2)   # 0.077
 # ==========================================================
 # MECHANISM AND SPECIFICITY: does the effect show up only where it can?
 # ==========================================================
-# The mechanism predicts a larger contrast where free shipping can act
-# than where it cannot. Fit the same focal model to eligible-category
+# The mechanism predicts a larger adjusted profit difference where free shipping can act
+# than where it cannot. Reuse the interaction specification in separate fits to eligible-category
 # profit, noneligible-category profit, and their per-user difference.
 
 df["category_difference"] = (
     df["eligible_category_profit"] - df["noneligible_category_profit"]
 )
 
-elig = smf.ols(f"eligible_category_profit ~ {FOCAL_RHS}", df).fit(cov_type="HC1")
-nonelig = smf.ols(f"noneligible_category_profit ~ {FOCAL_RHS}", df).fit(cov_type="HC1")
-difference = smf.ols(f"category_difference ~ {FOCAL_RHS}", df).fit(cov_type="HC1")
+elig = smf.ols(f"eligible_category_profit ~ {INTERACTION_RHS}", df).fit(cov_type="HC1")
+nonelig = smf.ols(f"noneligible_category_profit ~ {INTERACTION_RHS}", df).fit(cov_type="HC1")
+difference = smf.ols(f"category_difference ~ {INTERACTION_RHS}", df).fit(cov_type="HC1")
 
 for name, model in [("eligible", elig), ("noneligible", nonelig),
                     ("difference", difference)]:
@@ -585,12 +585,12 @@ for name, model in [("eligible", elig), ("noneligible", nonelig),
 # ==========================================================
 # HETEROGENEITY AS FALSIFICATION: leave-one-region-out
 # ==========================================================
-# Re-estimate the focal model after dropping each region in turn. If one
+# Re-estimate the interaction model after dropping each region in turn. If one
 # deletion moves the estimate sharply, the aggregate depends on that slice.
 
-full = smf.ols(f"profit_30d ~ {FOCAL_RHS}", df).fit().params["treated"]
+full = smf.ols(f"profit_30d ~ {INTERACTION_RHS}", df).fit().params["treated"]
 for r in sorted(df["region"].unique()):
-    m = smf.ols(f"profit_30d ~ {FOCAL_RHS}", df[df.region != r]).fit(cov_type="HC1")
+    m = smf.ols(f"profit_30d ~ {INTERACTION_RHS}", df[df.region != r]).fit(cov_type="HC1")
     print(r, round(m.params["treated"], 2), "vs full", round(full, 2))
 # range R$1.72-R$1.95; spread R$0.23
 
