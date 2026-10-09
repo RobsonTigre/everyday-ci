@@ -20,7 +20,6 @@
 # installs the exact pinned versions these results were produced with)
 
 # You must run the lines below at the start of every new Python session.
-import itertools
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt                    # balance and overlap plots
@@ -593,23 +592,3 @@ for r in sorted(df["region"].unique()):
     m = smf.ols(f"profit_30d ~ {INTERACTION_RHS}", df[df.region != r]).fit(cov_type="HC1")
     print(r, round(m.params["treated"], 2), "vs full", round(full, 2))
 # range R$1.72-R$1.95; spread R$0.23
-
-# ==========================================================
-# APPENDIX: SPECIFICATION CURVE
-# ==========================================================
-# When the grid of defensible choices grows large, a specification curve
-# plots the estimate across every pre-declared combination rather than
-# selecting one preferred path.
-
-spec_controls = ["prior_orders", "prior_profit", "sessions_pre",
-            "predicted_purchase_score", "tenure_days"]
-
-# Loop over every subset of controls: one estimate per defensible choice.
-rows = []
-for k in range(len(spec_controls) + 1):
-    for combo in itertools.combinations(spec_controls, k):
-        rhs = " + ".join(("treated",) + combo)
-        est = smf.ols(f"profit_30d ~ {rhs}", df).fit().params["treated"]
-        rows.append({"controls": combo, "treated": est})
-
-curve = pd.DataFrame(rows).sort_values("treated")  # plot this: the full spread

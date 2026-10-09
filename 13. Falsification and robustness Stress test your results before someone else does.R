@@ -16,7 +16,7 @@
 
 # If you haven't already, run this once to install the packages:
 # install.packages(c("tidyverse", "fixest", "sandwich", "MatchIt", "WeightIt",
-#                     "cobalt", "sensemakr", "dagitty", "lmtest", "specr", "readr"))
+#                     "cobalt", "sensemakr", "dagitty", "lmtest", "readr"))
 
 # You must run the lines below at the start of every new R session.
 library(tidyverse)   # data wrangling and plots
@@ -28,7 +28,6 @@ library(cobalt)      # balance diagnostics and love plots
 library(sensemakr)   # sensitivity analysis for unobserved confounding
 library(dagitty)     # draw DAGs and read off testable implications
 library(lmtest)      # coeftest() for robust-covariance inference
-library(specr)       # appendix: specification-curve analysis
 library(readr)       # used only inside the optional DGP block below
 
 # ==========================================================
@@ -739,21 +738,3 @@ full <- coef(feols(as.formula(paste("profit_30d ~", INTERACTION_RHS)),
                    data = df, vcov = "hetero"))["treated"]
 loo |> mutate(full = full)   # if one row swings far from `full`, be suspicious
 # range R$1.72-R$1.95; spread R$0.23
-
-# ==========================================================
-# APPENDIX: SPECIFICATION CURVE
-# ==========================================================
-# When the grid of defensible choices grows large, a specification curve
-# plots the estimate across every pre-declared combination rather than
-# selecting one preferred path.
-
-specs <- setup(
-  data = df,
-  y = "profit_30d",
-  x = "treated",
-  model = "lm",
-  controls = c("prior_orders", "prior_profit", "sessions_pre",
-               "predicted_purchase_score", "tenure_days")
-)
-results <- specr(specs)   # one row per defensible specification
-plot(results)             # the specification curve: read the spread, not a point
