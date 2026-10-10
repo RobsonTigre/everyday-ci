@@ -6,7 +6,7 @@ if (getOption("repos")["CRAN"] %in% c(NA, "@CRAN@")) {
   options(repos = c(CRAN = "https://cloud.r-project.org"))
 }
 
-install.packages(c(
+packages <- c(
   "tidyverse",
   "fixest",
   "did",
@@ -14,6 +14,7 @@ install.packages(c(
   "AER",
   "broom",
   "forecast",
+  "tidybayes",  # CausalArima imports it but omits it from DESCRIPTION
   "pwr",
   "RCT",
   "rdrobust",
@@ -26,8 +27,16 @@ install.packages(c(
   "grf",
   "policytree",
   "DiagrammeR"  # policytree suggests it
-))
+)
+install.packages(packages)
 
 # CausalArima is not on CRAN; install it from GitHub
 if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 remotes::install_github("FMenchetti/CausalArima", dependencies = TRUE)
+
+required_packages <- c(packages, "remotes", "CausalArima")
+missing_packages <- required_packages[!vapply(required_packages, requireNamespace,
+                                            logical(1), quietly = TRUE)]
+if (length(missing_packages)) {
+  stop("Installation failed: could not load ", paste(missing_packages, collapse = ", "))
+}
