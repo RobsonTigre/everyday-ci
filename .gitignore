@@ -23,8 +23,9 @@ venv/
 .DS_Store
 .quarto/
 
-# Private working notes (never commit)
-tasks/
+# Local task artifacts; track the shared task list
+tasks/*
+!tasks/todo.md
 
 # Reader-generated figures (keep the folder, ignore its contents)
 images/*
