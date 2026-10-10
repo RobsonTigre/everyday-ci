@@ -26,6 +26,14 @@ packages <- c(
   "patchwork",
   "grf",
   "policytree",
+  "sandwich",
+  "MatchIt",
+  "WeightIt",
+  "cobalt",
+  "sensemakr",
+  "dagitty",
+  "lmtest",
+  "readr",
   "DiagrammeR"  # policytree suggests it
 )
 install.packages(packages)
