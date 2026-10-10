@@ -1,8 +1,8 @@
 # Python dependencies for the Everyday Causal Inference code examples
-# Tested with Python 3.9+. Install with: pip install -r requirements.txt
-# Note: pycausalarima (chapter 11 only) needs Python 3.10+; pip skips it on older versions.
+# Install with: pip install -r requirements.txt
+# Chapter 11 uses the tested Python 3.12 stack in requirements-time-series.txt.
 numpy
-pandas<3  # pycausalimpact (chapter 11) uses APIs removed in pandas 3
+pandas  # Chapter 11 version is pinned in requirements-time-series.txt
 scipy
 matplotlib
 seaborn
@@ -17,5 +17,4 @@ mcf==0.6.0  # pinned: Chapter 12's Python policy-tree timing/output is documente
 psutil  # mcf imports this at load time (mcf_general_sys.py) but doesn't declare it as a dependency; without it, ch12's mcf import crashes with ModuleNotFoundError
 rdrobust
 rddensity
-pycausalimpact
-pycausalarima ; python_version >= "3.10"
+-r requirements-time-series.txt

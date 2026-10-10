@@ -31,3 +31,5 @@ images/*
 !images/.gitkeep
 everyday-ci-audit/
 everyday-ci-fix/
+
+.venv-time-series/

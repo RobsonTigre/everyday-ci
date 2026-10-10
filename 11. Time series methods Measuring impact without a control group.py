@@ -12,8 +12,8 @@
 
 # Setup -------------------------------------------------------------------
 # Install packages if needed:
-# pip install pycausalarima  # needs Python >= 3.10
-# pip install pycausalimpact "pandas<3"
+# Use Python 3.12 in a separate environment:
+# pip install -r requirements-time-series.txt
 
 import pandas as pd
 import numpy as np
@@ -21,7 +21,10 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend for script execution
 import matplotlib.pyplot as plt
 from pycausalarima import CausalArima
-from causalimpact import CausalImpact
+from causalimpact import (
+    DataOptions, InferenceOptions, ModelOptions, Seasons,
+    fit_causalimpact, summary as ci_summary,
+)
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from scipy.stats import shapiro
@@ -62,6 +65,35 @@ def apply_book_style(ax, base_size=14):
     ax.title.set_fontsize(base_size * 1.3)
     ax.title.set_fontweight("bold")
     ax.title.set_color("#333333")  # grey20 equivalent
+
+def plot_causalimpact_result(impact, dates, intervention_index):
+    """Plot the native forecast and effect intervals with the book's style."""
+    series = impact.series
+    fig, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=True)
+    axes[0].plot(dates, series["observed"], color="black", linewidth=1.2, label="Observed")
+    axes[0].plot(dates, series["posterior_mean"], color=BOOK_COLORS["primary"], linestyle="--", linewidth=1.3, label="Counterfactual")
+    axes[0].fill_between(dates, series["posterior_lower"], series["posterior_upper"], color=BOOK_COLORS["primary"], alpha=0.2)
+    axes[0].set_title("Observed and counterfactual")
+    axes[0].set_ylabel("Daily sales (R$ MM)")
+    axes[0].legend()
+    for ax, prefix, title, label in zip(
+        axes[1:], ("point_effects", "cumulative_effects"),
+        ("Pointwise effect", "Cumulative effect"),
+        ("Daily effect (R$ MM)", "Total effect (R$ MM)"),
+    ):
+        ax.plot(dates, series[prefix + "_mean"], color=BOOK_COLORS["primary"], linewidth=1.3)
+        ax.fill_between(dates, series[prefix + "_lower"], series[prefix + "_upper"], color=BOOK_COLORS["primary"], alpha=0.2)
+        ax.axhline(0, color=BOOK_COLORS["muted"], linestyle="--", linewidth=1)
+        ax.set_title(title)
+        ax.set_ylabel(label)
+    for ax in axes:
+        ax.axvline(dates.iloc[intervention_index], color=BOOK_COLORS["accent"], linestyle="--", linewidth=1)
+        apply_book_style(ax)
+    axes[-1].set_xlabel("Date")
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    return fig
+
 
 # ------------------------------------------------------------------------
 # Data Generating Process (DGP)
@@ -337,17 +369,33 @@ post_period_ci = [intervention_time - 1, total_days - 1]  # Post-Period: Days 84
 ci_data = data[["y", "x1"]].copy()
 ci_data.index = pd.RangeIndex(start=0, stop=len(ci_data))
 
+data_options_ci = DataOptions(outcome_column="y", standardize_data=True)
+model_options_ci = ModelOptions(
+    prior_level_sd=0.01,
+    seasons=[Seasons(num_seasons=7, num_steps_per_season=1)],
+)
+inference_options_ci = InferenceOptions(num_warmup_steps=500, num_results=4500)
+
 # Run the CausalImpact analysis
-impact_ci = CausalImpact(ci_data, pre_period_ci, post_period_ci)
+impact_ci = fit_causalimpact(
+    ci_data, pre_period_ci, post_period_ci,
+    data_options=data_options_ci,
+    model_options=model_options_ci,
+    inference_options=inference_options_ci,
+    alpha=0.05,
+    seed=42,
+)
 
 # Display a summary of the results
-summary_ci = impact_ci.summary()
-report_ci = impact_ci.summary(output="report")
+summary_ci = impact_ci.summary
+print(summary_ci.to_string())
+report_ci = ci_summary(impact_ci, output_format="report")
+print(report_ci)
 
 # Plot the impact
-impact_ci.plot()
-plt.savefig("images/causalimpact_main_py.png", dpi=300, bbox_inches="tight")
-plt.close()
+figure_ci = plot_causalimpact_result(impact_ci, data["date"], post_period_ci[0])
+figure_ci.savefig("images/causalimpact_main_py.png", dpi=300, bbox_inches="tight")
+plt.close(figure_ci)
 
 # ------------------------------------------------------------------------
 # Robustness test 1 CausalImpact: no pre-intervention effects
@@ -360,14 +408,23 @@ ci_data_placebo.index = pd.RangeIndex(start=0, stop=len(ci_data_placebo))
 pre_period_placebo_ci = [0, placebo_intervention_time - 2]  # Pre-Period: Days 0 to 58 (1 to 59 in 1-based)
 post_period_placebo_ci = [placebo_intervention_time - 1, 79]  # Post-Period: Days 59 to 79 (60 to 80 in 1-based)
 
-impact_placebo_ci = CausalImpact(ci_data_placebo, pre_period_placebo_ci, post_period_placebo_ci)
+impact_placebo_ci = fit_causalimpact(
+    ci_data_placebo, pre_period_placebo_ci, post_period_placebo_ci,
+    data_options=data_options_ci,
+    model_options=model_options_ci,
+    inference_options=inference_options_ci,
+    alpha=0.05,
+    seed=42,
+)
 
 # Should show no significant effect
-report_placebo_ci = impact_placebo_ci.summary(output="report")
+print(impact_placebo_ci.summary.to_string())
+report_placebo_ci = ci_summary(impact_placebo_ci, output_format="report")
+print(report_placebo_ci)
 
-impact_placebo_ci.plot()
-plt.savefig("images/causalimpact_placebo_py.png", dpi=300, bbox_inches="tight")
-plt.close()
+figure_placebo_ci = plot_causalimpact_result(impact_placebo_ci, data["date"].iloc[:80], post_period_placebo_ci[0])
+figure_placebo_ci.savefig("images/causalimpact_placebo_py.png", dpi=300, bbox_inches="tight")
+plt.close(figure_placebo_ci)
 
 # ------------------------------------------------------------------------
 # Robustness test 2 CausalImpact: no effect in the auxiliary series
@@ -400,11 +457,20 @@ summary_aux = ca_aux.summary()
 ci_data_no_aux = data[["y"]].copy()
 ci_data_no_aux.index = pd.RangeIndex(start=0, stop=len(ci_data_no_aux))
 
-impact_no_aux = CausalImpact(ci_data_no_aux, pre_period_ci, post_period_ci)
+impact_no_aux = fit_causalimpact(
+    ci_data_no_aux, pre_period_ci, post_period_ci,
+    data_options=data_options_ci,
+    model_options=model_options_ci,
+    inference_options=inference_options_ci,
+    alpha=0.05,
+    seed=42,
+)
 
 # Compare results: with vs without auxiliary series
-summary_with_aux = impact_ci.summary()
-summary_without_aux = impact_no_aux.summary()
+summary_with_aux = impact_ci.summary
+summary_without_aux = impact_no_aux.summary
+print(summary_with_aux.to_string())
+print(summary_without_aux.to_string())
 
 # ------------------------------------------------------------------------
 # Appendix: C-ARIMA with external regressors (xreg)
