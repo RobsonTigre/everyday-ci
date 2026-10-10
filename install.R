@@ -40,7 +40,7 @@ install.packages(packages)
 
 # CausalArima is not on CRAN; install it from GitHub
 if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
-remotes::install_github("FMenchetti/CausalArima", dependencies = TRUE)
+remotes::install_github("FMenchetti/CausalArima@890854054f7f9e64c3304b6f7ea0cb19d9143769", dependencies = TRUE)
 
 required_packages <- c(packages, "remotes", "CausalArima")
 missing_packages <- required_packages[!vapply(required_packages, requireNamespace,

@@ -15,7 +15,7 @@
 # ==========================================================
 
 # If you haven't already, run this once to install the packages:
-# install.packages(c("tidyverse", "fixest", "skimr", "plm"))
+# install.packages(c("tidyverse", "fixest", "skimr", "plm", "broom"))
 
 library(tidyverse)
 library(fixest)

@@ -13,7 +13,7 @@
 # -----------------------------------------------------------------------------
 # 1. Setup and Packages
 # -----------------------------------------------------------------------------
-# install.packages(c("tidyverse", "rdrobust", "rddensity", "lpdensity"))
+# install.packages(c("tidyverse", "rdrobust", "rddensity", "lpdensity", "skimr"))
 
 library(tidyverse) # Data manipulation and visualization
 library(rdrobust) # RDD estimation and plotting

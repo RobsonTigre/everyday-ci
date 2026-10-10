@@ -23,6 +23,8 @@ https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/<filename>.c
 
 ### Setup
 
+Run scripts from the repository root so relative paths to `data/` and `images/` resolve correctly.
+
 To install every package used across the book's code examples in one go:
 
 **Python** (use Python 3.12 for Chapter 11's tested TensorFlow stack):

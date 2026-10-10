@@ -11,9 +11,11 @@
 ##########################################################
 
 # Setup -------------------------------------------------------------------
-# Install packages if needed (CausalArima is not on CRAN; get it from GitHub):
+# Install packages if needed:
+# install.packages(c("tidyverse", "forecast", "CausalImpact", "gridExtra", "tidybayes"))
+# CausalArima is not on CRAN; install the tested version from GitHub:
 # if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
-# remotes::install_github("FMenchetti/CausalArima", dependencies = TRUE)
+# remotes::install_github("FMenchetti/CausalArima@890854054f7f9e64c3304b6f7ea0cb19d9143769", dependencies = TRUE)
 
 library(tidyverse)
 library(forecast)
