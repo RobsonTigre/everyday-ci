@@ -25,10 +25,21 @@ https://raw.githubusercontent.com/RobsonTigre/everyday-ci/main/data/<filename>.c
 
 To install every package used across the book's code examples in one go:
 
-**Python** (tested with 3.9+; chapter 11's `pycausalarima` needs 3.10+ and is skipped automatically on older versions):
+**Python** (use Python 3.12 for Chapter 11's tested TensorFlow stack):
+
+Start with a fresh Python environment: `pycausalimpact` and `tfp-causalimpact`
+share the import name `causalimpact`.
 
 ```bash
 pip install -r requirements.txt
+```
+
+For Chapter 11 alone, create a separate environment to avoid conflicts with other
+packages that also import as `causalimpact`:
+
+```bash
+python3.12 -m venv .venv-time-series
+.venv-time-series/bin/python -m pip install -r requirements-time-series.txt
 ```
 
 **R**:
