@@ -21,6 +21,20 @@ library(CausalImpact)
 library(CausalArima)
 library(gridExtra)
 
+# shortcut: depends on current package helpers; remove after verifying an upstream fix.
+impact_CA <- function(x, ...) {
+  env <- new.env(parent = asNamespace("CausalArima"))
+  env$ce <- x
+
+  for (name in c("impact", ".impact_summary", ".impact_summary_horizons")) {
+    fn <- get(name, envir = env)
+    environment(fn) <- env
+    assign(name, fn, envir = env)
+  }
+
+  env$impact(x, ...)
+}
+
 # ------------------------------------------------------------------------
 # Book-wide Theme and Color Palette
 # ------------------------------------------------------------------------
@@ -172,7 +186,7 @@ ce <- CausalArima(
 )
 
 # Display results
-summary_model_CA <- impact(ce)
+summary_model_CA <- impact_CA(ce)
 print(summary_model_CA$arima) # ARIMA model details
 print(summary_model_CA$impact_norm) # Normalized impact
 
@@ -227,7 +241,7 @@ ce_placebo <- CausalArima(
 )
 
 # Check results - should show no significant effect
-summary_placebo <- impact(ce_placebo)
+summary_placebo <- impact_CA(ce_placebo)
 print(summary_placebo$impact_norm)
 
 # Visualize the placebo counterfactual forecast
@@ -402,7 +416,7 @@ forecasted_aux <- plot(ce_aux, type = "forecast")
 print(forecasted_aux)
 
 # Check impact estimate — should be near zero and not statistically significant
-summary_aux <- impact(ce_aux)
+summary_aux <- impact_CA(ce_aux)
 print(summary_aux$impact_norm)
 # Interpretation: If the confidence interval includes zero, x1 was likely
 # unaffected by the intervention (good!). If significant, CausalImpact
@@ -460,7 +474,7 @@ ce_no_x <- CausalArima(
     int.date = intervention_date,
     nboot = 1000
 )
-result_no_x <- impact(ce_no_x)
+result_no_x <- impact_CA(ce_no_x)
 
 # C-ARIMA WITH external regressors
 # Pass x1 as a matrix via the xreg argument.
@@ -473,7 +487,7 @@ ce_with_x <- CausalArima(
     xreg = as.matrix(data$x1),
     nboot = 1000
 )
-result_with_x <- impact(ce_with_x)
+result_with_x <- impact_CA(ce_with_x)
 
 # Compare estimates
 print("C-ARIMA without X:")
