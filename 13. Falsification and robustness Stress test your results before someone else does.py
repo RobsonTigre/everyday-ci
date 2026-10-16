@@ -435,8 +435,8 @@ report_correlation("predicted_purchase_score _||_ profit_30d after adjustment fo
 # ==========================================================
 # ROBUSTNESS GRID: six defensible specifications, one lever at a time
 # ==========================================================
-# Core controls, context covariates, the targeting score, common-support
-# trimming, ATT weighting, and 1:1 nearest-neighbour matching -- read this
+# Core controls, additional covariates, the targeting score, common-support
+# trimming, IPW for the ATT, and 1:1 nearest-neighbour matching -- read this
 # grid for effect-size stability, never as an average.
 
 interaction_rhs = INTERACTION_RHS
@@ -480,7 +480,7 @@ nn = smf.wls(f"profit_30d ~ {interaction_rhs}", matched_grid,
              weights=matched_grid["match_weight"]).fit(cov_type="HC3")
 
 # Read the six targeted-standardized estimates; never duplicate reused controls.
-for name, m in [("Interaction model", interaction_model), ("context", context),
+for name, m in [("Interaction model", interaction_model), ("Additional covariates", context),
                 ("score", score), ("trimmed", trimmed), ("ipw", ipw),
                 ("nn", nn)]:
     covariance = "HC3" if name == "nn" else "HC1"
