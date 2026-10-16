@@ -435,8 +435,8 @@ report_correlation("predicted_purchase_score _||_ profit_30d after adjustment fo
 # ==========================================================
 # ROBUSTNESS GRID: six defensible specifications, one lever at a time
 # ==========================================================
-# Core controls, context covariates, the targeting score, common-support
-# trimming, ATT weighting, and 1:1 nearest-neighbour matching -- read this
+# Core controls, additional covariates, the targeting score, common-support
+# trimming, IPW for the ATT, and 1:1 nearest-neighbour matching -- read this
 # grid for effect-size stability, never as an average.
 
 interaction_rhs = INTERACTION_RHS
@@ -479,11 +479,11 @@ matched_grid = pd.concat([t_df, matched_controls2])
 nn = smf.wls(f"profit_30d ~ {interaction_rhs}", matched_grid,
              weights=matched_grid["match_weight"]).fit(cov_type="HC3")
 
-# Read the six targeted-standardized estimates; never duplicate reused controls.
-for name, m in [("Interaction model", interaction_model), ("context", context),
+# Read the six adjusted estimates; never duplicate reused controls.
+for name, m in [("Interaction model", interaction_model), ("Additional covariates", context),
                 ("score", score), ("trimmed", trimmed), ("ipw", ipw),
-                ("nn", nn)]:
-    covariance = "HC3" if name == "nn" else "HC1"
+                ("matching", nn)]:
+    covariance = "HC3" if name == "matching" else "HC1"
     report_regression(name, m, "treated", covariance=covariance)
 report_regression("IPW placebo in time", ipw_placebo_time)
 report_regression("IPW noneligible-category placebo", ipw_negative_control)
@@ -574,11 +574,11 @@ elig = smf.ols(f"eligible_category_profit ~ {INTERACTION_RHS}", df).fit(cov_type
 nonelig = smf.ols(f"noneligible_category_profit ~ {INTERACTION_RHS}", df).fit(cov_type="HC1")
 difference = smf.ols(f"category_difference ~ {INTERACTION_RHS}", df).fit(cov_type="HC1")
 
-for name, model in [("eligible", elig), ("noneligible", nonelig),
+for name, model in [("eligible-category profit", elig), ("noneligible-category profit", nonelig),
                     ("difference", difference)]:
     report_regression(name, model)
-# eligible: estimate = 1.4938; HC1 SE = 0.0824; 95% Student-t CI = [1.3324, 1.6552]
-# noneligible: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
+# eligible-category profit: estimate = 1.4938; HC1 SE = 0.0824; 95% Student-t CI = [1.3324, 1.6552]
+# noneligible-category profit: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
 # difference: estimate = 0.3671; HC1 SE = 0.1109; 95% Student-t CI = [0.1497, 0.5845]
 
 # ==========================================================

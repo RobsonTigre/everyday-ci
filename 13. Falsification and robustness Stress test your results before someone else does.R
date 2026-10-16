@@ -600,8 +600,8 @@ report_correlation(
 # ==========================================================
 # ROBUSTNESS GRID: six defensible specifications, one lever at a time
 # ==========================================================
-# Core controls, context covariates, the targeting score, common-support
-# trimming, ATT weighting, and 1:1 nearest-neighbour matching -- read this
+# Core controls, additional covariates, the targeting score, common-support
+# trimming, IPW for the ATT, and 1:1 nearest-neighbour matching -- read this
 # grid for effect-size stability, never as an average.
 
 interaction_formula <- as.formula(paste("profit_30d ~", INTERACTION_RHS))
@@ -642,7 +642,7 @@ nn <- lm(interaction_formula, data = matched_grid, weights = weights)
 
 # HC1 for five rows; HC3 for the fitted match. Every row prints the
 # estimate, robust SE, and a Student-t interval using its residual df.
-models <- list("Interaction model" = interaction_model, context = context, score = score,
+models <- list("Interaction model" = interaction_model, "Additional covariates" = context, score = score,
                trimmed = trimmed, ipw = ipw, matching = nn)
 walk(names(models), function(name) {
   covariance <- if (name == "matching") "HC3" else "HC1"
@@ -714,12 +714,12 @@ nonelig <- lm(as.formula(paste("noneligible_category_profit ~", INTERACTION_RHS)
 difference <- lm(as.formula(paste("category_difference ~", INTERACTION_RHS)), data = df)
 
 walk2(
-  c("eligible", "noneligible", "difference"),
+  c("eligible-category profit", "noneligible-category profit", "difference"),
   list(elig, nonelig, difference),
   report_regression
 )
-#> eligible: estimate = 1.4938; HC1 SE = 0.0824; 95% Student-t CI = [1.3324, 1.6552]
-#> noneligible: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
+#> eligible-category profit: estimate = 1.4938; HC1 SE = 0.0824; 95% Student-t CI = [1.3324, 1.6552]
+#> noneligible-category profit: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
 #> difference: estimate = 0.3671; HC1 SE = 0.1109; 95% Student-t CI = [0.1497, 0.5845]
 
 # ==========================================================
