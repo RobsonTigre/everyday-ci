@@ -212,9 +212,9 @@ score_fit = smf.ols(
     f"profit_30d ~ fake_score_exposure + {CORE}", data=df
 ).fit(cov_type="HC1")
 
-report_regression("deterministic null", null_fit, "placebo_null")
+report_regression("deterministic null permutation", null_fit, "placebo_null")
 report_regression("score-preserving fake exposure", score_fit, "fake_score_exposure")
-# deterministic null: estimate = -0.0626; HC1 SE = 0.1197; 95% Student-t CI = [-0.2972, 0.1720]
+# deterministic null permutation: estimate = -0.0626; HC1 SE = 0.1197; 95% Student-t CI = [-0.2972, 0.1720]
 # score-preserving fake exposure: estimate = 1.5868; HC1 SE = 0.1838; 95% Student-t CI = [1.2266, 1.9471]
 
 # ==========================================================
@@ -417,7 +417,7 @@ report_regression("placebo in time using the interaction model",
                   smf.ols(f"profit_pre ~ {INTERACTION_RHS}", df).fit(cov_type="HC1"))
 report_regression("negative control using the interaction model",
                   smf.ols(f"noneligible_category_profit ~ {INTERACTION_RHS}", df).fit(cov_type="HC1"))
-report_regression("deterministic null using the interaction model",
+report_regression("deterministic null permutation using the interaction model",
                   smf.ols(f"profit_30d ~ placebo_null + {INTERACTION_RHS}", df).fit(cov_type="HC1"),
                   "placebo_null")
 report_regression("score-preserving fake exposure using the interaction model",
@@ -428,7 +428,7 @@ report_correlation("predicted_purchase_score _||_ profit_30d after adjustment fo
                    smf.ols(f"profit_30d ~ {INTERACTION_RHS}", df).fit().resid)
 # placebo in time using the interaction model: estimate = 1.6037; HC1 SE = 0.1384; 95% Student-t CI = [1.3325, 1.8750]
 # negative control using the interaction model: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
-# deterministic null using the interaction model: estimate = -0.0507; HC1 SE = 0.1187; 95% Student-t CI = [-0.2835, 0.1820]
+# deterministic null permutation using the interaction model: estimate = -0.0507; HC1 SE = 0.1187; 95% Student-t CI = [-0.2835, 0.1820]
 # score-preserving fake exposure using the interaction model: estimate = 1.3766; HC1 SE = 0.1828; 95% Student-t CI = [1.0182, 1.7349]
 # predicted_purchase_score _||_ profit_30d after adjustment for the interaction model's regressors: Pearson r = 0.1058; 95% Fisher CI = [0.0946, 0.1170]
 
