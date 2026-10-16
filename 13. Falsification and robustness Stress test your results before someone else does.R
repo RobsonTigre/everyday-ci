@@ -714,12 +714,12 @@ nonelig <- lm(as.formula(paste("noneligible_category_profit ~", INTERACTION_RHS)
 difference <- lm(as.formula(paste("category_difference ~", INTERACTION_RHS)), data = df)
 
 walk2(
-  c("eligible", "noneligible", "difference"),
+  c("eligible-category profit", "noneligible-category profit", "difference"),
   list(elig, nonelig, difference),
   report_regression
 )
-#> eligible: estimate = 1.4938; HC1 SE = 0.0824; 95% Student-t CI = [1.3324, 1.6552]
-#> noneligible: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
+#> eligible-category profit: estimate = 1.4938; HC1 SE = 0.0824; 95% Student-t CI = [1.3324, 1.6552]
+#> noneligible-category profit: estimate = 1.1267; HC1 SE = 0.0849; 95% Student-t CI = [0.9604, 1.2931]
 #> difference: estimate = 0.3671; HC1 SE = 0.1109; 95% Student-t CI = [0.1497, 0.5845]
 
 # ==========================================================
