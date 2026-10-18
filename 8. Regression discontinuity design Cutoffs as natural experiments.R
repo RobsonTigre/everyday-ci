@@ -353,6 +353,7 @@ x <- pmin(pmax(x, 400), 900) # Bound between 400 and 900
 
 # Observed covariates (balanced at cutoff, correlated with U)
 business_age <- pmax(round(8 + 2 * U + rnorm(n_fuzzy, 0, 3)), 1)
+annual_revenue <- pmax(500000 + 100000 * U + rnorm(n_fuzzy, 0, 150000), 50000)
 employees <- pmax(round(12 + 3 * U + rpois(n_fuzzy, lambda = 5)), 1)
 
 # Eligibility (instrument Z): deterministic at cutoff
@@ -362,36 +363,38 @@ Z <- as.numeric(x >= 650)
 # Probability depends on eligibility AND unobserved ambition (U)
 # U affects both uptake and outcomes, creating selection bias
 
-prob_below <- plogis(-1.5 + 0.8 * U) # ~15-30% depending on U
-prob_above <- plogis(1.2 + 0.6 * U) # ~70-90% depending on U
+prob_below <- plogis(-1.5 + 2 * U)
+prob_above <- plogis(1.2 + 2 * U)
 
-prob_treatment <- ifelse(Z == 1, prob_above, prob_below)
-D <- rbinom(n_fuzzy, 1, prob_treatment)
-
-# Expected treatment rates: ~20% below cutoff, ~80% above
+# One shared draw makes eligibility weakly increase every business's uptake.
+uptake_draw <- runif(n_fuzzy)
+D0 <- as.numeric(uptake_draw < prob_below)
+D1 <- as.numeric(uptake_draw < prob_above)
+D <- ifelse(Z == 1, D1, D0)
 
 # Outcome: TRUE EFFECT = R$5,000; U also affects revenue (selection bias)
 treatment_effect <- 5000
 
-y <- 25000 +
+y0 <- pmax(25000 +
     15 * (x - 650) + # Credit score effect
-    treatment_effect * D + # TRUE EFFECT (what we want to recover)
-    3000 * U + # Selection bias (U affects revenue directly)
+    6000 * U + # Selection bias (U affects revenue directly)
     100 * business_age + # Older businesses earn slightly more
+    0.01 * annual_revenue + # Larger businesses earn more
     50 * employees + # More employees = more capacity
-    rnorm(n_fuzzy, 0, 4000) # Noise
+    rnorm(n_fuzzy, 0, 4000), 0) # Nonnegative untreated revenue
 
-y <- pmax(y, 0) # Revenue can't be negative
+y <- y0 + treatment_effect * D # Preserve the exact R$5,000 effect at the floor
 
 # Assemble and save
 data_fuzzy <- data.frame(
     x = x, y = y, D = D, Z = Z,
     business_age = business_age,
+    annual_revenue = annual_revenue,
     employees = employees
 )
 
 # Save the data
-# write.csv(data_fuzzy, "data/rdd_fuzzy_fintech.csv", row.names = FALSE)
+write.csv(data_fuzzy, "data/rdd_fuzzy_fintech.csv", row.names = FALSE)
 
 # -----------------------------------------------------------------------------
 # 4.1 Demonstrating the Selection Problem
@@ -407,7 +410,7 @@ naive_fuzzy <- lm(y ~ D, data = data_fuzzy)
 summary(naive_fuzzy)
 
 # OLS with controls: still biased (U is unobserved)
-ols_fuzzy <- lm(y ~ D + x + business_age + employees, data = data_fuzzy)
+ols_fuzzy <- lm(y ~ D + x + business_age + employees + annual_revenue, data = data_fuzzy)
 summary(ols_fuzzy)
 
 # -----------------------------------------------------------------------------
@@ -425,6 +428,7 @@ rdplotdensity(density_test_fuzzy, data_fuzzy$x,
 
 # Covariate balance: covariates should not jump at cutoff
 summary(rdrobust(data_fuzzy$business_age, data_fuzzy$x, c = 650))
+summary(rdrobust(data_fuzzy$annual_revenue, data_fuzzy$x, c = 650))
 summary(rdrobust(data_fuzzy$employees, data_fuzzy$x, c = 650))
 
 # First stage: eligibility must strongly predict treatment
@@ -516,11 +520,21 @@ fuzzy_result <- rdrobust(
 )
 summary(fuzzy_result)
 
-# With covariates (reduces SE without changing estimate)
+# Match the outcome and treatment jumps to the main fuzzy model's windows.
+fuzzy_reduced_form <- rdrobust(data_fuzzy$y, data_fuzzy$x, c = 650,
+    h = fuzzy_result$bws[1, ], b = fuzzy_result$bws[2, ])
+fuzzy_first_stage <- rdrobust(data_fuzzy$D, data_fuzzy$x, c = 650,
+    h = fuzzy_result$bws[1, ], b = fuzzy_result$bws[2, ])
+fuzzy_ratio <- fuzzy_reduced_form$coef[1] / fuzzy_first_stage$coef[1]
+stopifnot(abs(fuzzy_ratio - fuzzy_result$coef[1]) < 1e-6)
+cat(sprintf("Outcome jump: R$%.2f\nLoan probability jump: %.2f percentage points\nLATE: R$%.2f\n",
+    fuzzy_reduced_form$coef[1], 100 * fuzzy_first_stage$coef[1], fuzzy_ratio))
+
+# With covariates (for precision)
 fuzzy_result_cov <- rdrobust(data_fuzzy$y, data_fuzzy$x,
     c = 650,
     fuzzy = data_fuzzy$D,
-    covs = data_fuzzy[, c("business_age", "employees")]
+    covs = data_fuzzy[, c("business_age", "employees", "annual_revenue")]
 )
 summary(fuzzy_result_cov)
 
@@ -547,7 +561,8 @@ subset_data_fuzzy <- data_fuzzy %>% filter(x > 550 & x < 750)
 # Get rdplot base
 rdplot_fuzzy_base <- rdplot(
     y = subset_data_fuzzy$y, x = subset_data_fuzzy$x, c = 650,
-    title = "Fuzzy RDD: loan effect on secondary revenue",
+    p = 1, h = fuzzy_result$bws[1, ], kernel = "triangular",
+    title = "Fuzzy RDD: secondary revenue at the cutoff",
     y.label = "Secondary revenue (R$)",
     x.label = "Credit score"
 )$rdplot

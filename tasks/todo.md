@@ -271,3 +271,16 @@ publication statements are superseded by the commit statuses in this checklist.
 This list covers surviving known student-script concerns. It cannot recover the
 deleted audit report or establish that all repository defects have been found.
 The setup branch/worktree remains at `420ea70`; its removal is not authorized.
+
+
+## Fuzzy RDD redesign — 2026-10-18
+
+- [x] Inventory every book/code/media dependency.
+- [x] Repair canonical generator test-first; pass frozen 500-seed checks.
+- [x] Recompute and reconcile R/Python results and shared data.
+- [x] Update affected prose, tables, figures and code; audit media and record user-deferred replacement.
+- [x] Render full book; verify impact map and independent review.
+
+Review: implementation complete in isolated task branches. The canonical generator passed 18 checks; four actual R/Python ratio/plot tests and the three existing probability-plot tests passed. Both full Chapter 8 scripts ran; 316 numerical fields agree to two decimals. All frozen 500-sample acceptance criteria passed. All 24 configured pages rendered; affected crossrefs, image paths, table and desktop/mobile views checked. The 30-recording audit found affected results only in Chapter 8 EN/PT; replacement is user-deferred and every MP3 is unchanged. Independent review is closed. Original dirty work and CSVs remain preserved; concurrent main commits touch unrelated review tooling only. No task-owned processes remain. No commit, merge, push or publication by this task.
+
+Evidence: book `reports/chapter-reviews/fuzzy-rdd-redesign-20261018/REPORT.md`, exact manifest, numerical ledger, logs, media handoff and preservation record.

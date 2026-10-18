@@ -1,0 +1,48 @@
+# Run from the student repository: Rscript tests/test_fuzzy_generator.R
+source("tests/fuzzy_generator_helpers.R")
+root <- normalizePath(".")
+e <- run_fuzzy_generator(root)
+failures <- character()
+check <- function(condition, label) {
+    ok <- isTRUE(condition)
+    cat(if (ok) "PASS" else "FAIL", label, "\n")
+    if (!ok) failures <<- c(failures, label)
+}
+columns <- c("x", "y", "D", "Z", "business_age", "annual_revenue", "employees")
+check(identical(names(e$data_fuzzy), columns), "canonical generated CSV schema/order includes annual revenue; latent variables stay private")
+check(e$n_fuzzy == 15000 && e$treatment_effect == 5000 && all(e$Z == (e$x >= 650)), "frozen sample, cutoff and true effect")
+check(exists("D0", e) && exists("D1", e) && exists("uptake_draw", e), "shared potential-uptake draw is explicit")
+if (exists("D0", e) && exists("D1", e)) {
+    check(all(e$D1 >= e$D0), "monotone uptake for every business")
+    check(all(e$D == ifelse(e$Z == 1, e$D1, e$D0)), "observed uptake selects the assigned potential state")
+}
+check(exists("y0", e), "untreated revenue is floored before treatment is added")
+if (exists("y0", e)) check(all(e$y0 >= 0) && max(abs(e$y - e$y0 - 5000 * e$D)) < 1e-10, "exact constant effect, including the untreated floor")
+# Recreate only the preserved pre-treatment draw sequence, not the DGP.
+set.seed(2025)
+u <- rnorm(15000)
+x <- pmin(pmax(650 + 40 * u + rnorm(15000, 0, 60), 400), 900)
+age <- pmax(round(8 + 2 * u + rnorm(15000, 0, 3)), 1)
+annual <- pmax(500000 + 100000 * u + rnorm(15000, 0, 150000), 50000)
+employees <- pmax(round(12 + 3 * u + rpois(15000, lambda = 5)), 1)
+check(exists("uptake_draw", e) && identical(e$uptake_draw, runif(15000)), "shared uptake uniform follows all original covariate draws")
+check(identical(e$x, x) && identical(e$business_age, age) && exists("annual_revenue", e) && identical(e$annual_revenue, annual) && identical(e$employees, employees), "original joint covariate distribution and draw order")
+check(isTRUE(all.equal(e$prob_below, plogis(-1.5 + 2 * e$U))) && isTRUE(all.equal(e$prob_above, plogis(1.2 + 2 * e$U))), "frozen uptake coefficients")
+expressions <- fuzzy_expressions(root)
+assignments <- Filter(function(expr) is.call(expr) && identical(expr[[1]], as.name("<-")), as.list(expressions))
+rhs <- setNames(lapply(assignments, function(expr) expr[[3]]), vapply(assignments, function(expr) as.character(expr[[2]]), character(1)))
+check("y0" %in% names(rhs) && !any(c("Z", "D", "D0", "D1") %in% all.vars(rhs$y0)), "exclusion: eligibility has no direct untreated-outcome term")
+check(all(vapply(rhs[c("U", "x", "business_age", "annual_revenue", "employees")], function(expr) !("Z" %in% all.vars(expr)), logical(1))), "pre-treatment variables have no structural cutoff jump")
+check(identical(all.vars(rhs$y), c("y0", "treatment_effect", "D")), "outcome adds treatment after the untreated floor without a direct eligibility term")
+r <- readLines(file.path(root, fuzzy_source))
+py <- readLines(file.path(root, sub("\\.R$", ".py", fuzzy_source)))
+check(any(grepl('^write.csv\\(data_fuzzy, "data/rdd_fuzzy_fintech.csv", row.names = FALSE\\)$', r)), "R actively writes the shared CSV")
+check(!any(grepl("^np.random.seed\\(2025\\)", py)) && sum(grepl('^data_fuzzy = pd.read_csv', py)) == 1L, "Python reads the shared CSV without an independent fuzzy generator")
+check(any(grepl('ols_fuzzy <- lm(y ~ D + x + business_age + employees + annual_revenue', r, fixed = TRUE)) && any(grepl('ols_fuzzy = smf.ols("y ~ D + x + business_age + employees + annual_revenue"', py, fixed = TRUE)), "full OLS uses all three observed covariates in both languages")
+check(any(grepl('covs = data_fuzzy[, c("business_age", "employees", "annual_revenue")]', r, fixed = TRUE)) && any(grepl("covariates_fuzzy = data_fuzzy[['business_age', 'employees', 'annual_revenue']].values", py, fixed = TRUE)), "adjusted fuzzy RD uses all three covariates")
+if ("--check-csv" %in% commandArgs(TRUE)) {
+    saved <- read.csv("data/rdd_fuzzy_fintech.csv")
+    check(identical(names(saved), columns) && isTRUE(all.equal(saved, e$data_fuzzy, tolerance = 1e-12)), "saved CSV reproduces canonical seed 2025")
+}
+if (length(failures)) stop(length(failures), " generator/teaching checks failed", call. = FALSE)
+cat("All canonical generator/teaching checks passed.\n")

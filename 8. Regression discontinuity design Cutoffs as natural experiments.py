@@ -315,71 +315,13 @@ plt.show()
 # Unobserved confounder U ("business ambition") drives credit score, loan uptake,
 # and revenue, creating selection bias that naive comparisons cannot handle.
 
-np.random.seed(2025)
-n_fuzzy = 15000
-
-# Unobs. confounder: high-U businesses have better finances, more likely to take loans, higher revenue
-U = np.random.normal(0, 1, n_fuzzy)
-
-# Running variable: credit score (correlated with U)
-x = 650 + 40 * U + np.random.normal(0, 60, n_fuzzy)
-x = np.clip(x, 400, 900)  # Bound between 400 and 900
-
-# Observed covariates (balanced at cutoff, correlated with U)
-business_age = np.maximum(np.round(8 + 2 * U + np.random.normal(0, 3, n_fuzzy)), 1)
-employees = np.maximum(np.round(12 + 3 * U + np.random.poisson(5, n_fuzzy)), 1)
-
-# Eligibility (instrument Z): deterministic at cutoff
-Z = (x >= 650).astype(int)
-
-# Step 5: Treatment Uptake (D) - the fuzzy part
-# Probability depends on eligibility AND unobserved ambition (U)
-# U affects both uptake and outcomes, creating selection bias
-
-def expit(x):
-    """Logistic function (inverse logit)."""
-    return 1 / (1 + np.exp(-x))
-
-prob_below = expit(-1.5 + 0.8 * U)  # ~15-30% depending on U
-prob_above = expit(1.2 + 0.6 * U)   # ~70-90% depending on U
-
-prob_treatment = np.where(Z == 1, prob_above, prob_below)
-D = np.random.binomial(1, prob_treatment)
-
-# Expected treatment rates: ~20% below cutoff, ~80% above
-
-# Outcome: TRUE EFFECT = R$5,000; U also affects revenue (selection bias)
-treatment_effect = 5000
-
-y = (25000 +
-     15 * (x - 650) +               # Credit score effect
-     treatment_effect * D +          # TRUE EFFECT (what we want to recover)
-     3000 * U +                      # Selection bias (U affects revenue directly)
-     100 * business_age +            # Older businesses earn slightly more
-     50 * employees +                # More employees = more capacity
-     np.random.normal(0, 4000, n_fuzzy))  # Noise
-
-y = np.maximum(y, 0)  # Revenue can't be negative
-
-# Assemble and save
-data_fuzzy = pd.DataFrame({
-    'x': x,
-    'y': y,
-    'D': D,
-    'Z': Z,
-    'business_age': business_age,
-    'employees': employees
-})
-
-# Save the data
-# data_fuzzy.to_csv("data/rdd_fuzzy_fintech.csv", index=False)
+# R generates the shared CSV; latent simulation variables are never exported.
+# Both languages analyze exactly the same observed businesses.
+data_fuzzy = pd.read_csv("data/rdd_fuzzy_fintech.csv")
 
 # -----------------------------------------------------------------------------
 # 4.1 Demonstrating the Selection Problem
 # -----------------------------------------------------------------------------
-
-# Load data (or use the data frame we just created)
-data_fuzzy = pd.read_csv("data/rdd_fuzzy_fintech.csv")
 
 # Before running Fuzzy RDD, let's see why naive comparisons fail.
 
@@ -389,7 +331,7 @@ print("Naive comparison (Fuzzy):")
 print(naive_fuzzy.summary())
 
 # OLS with controls: still biased (U is unobserved)
-ols_fuzzy = smf.ols("y ~ D + x + business_age + employees", data=data_fuzzy).fit()
+ols_fuzzy = smf.ols("y ~ D + x + business_age + employees + annual_revenue", data=data_fuzzy).fit()
 print("OLS with controls (Fuzzy):")
 print(ols_fuzzy.summary())
 
@@ -412,6 +354,9 @@ plt.show()
 # Covariate balance: covariates should not jump at cutoff
 print("Covariate balance - business_age:")
 print(rdrobust(y=data_fuzzy['business_age'], x=data_fuzzy['x'], c=650))
+
+print("Covariate balance - annual_revenue:")
+print(rdrobust(y=data_fuzzy['annual_revenue'], x=data_fuzzy['x'], c=650))
 
 print("Covariate balance - employees:")
 print(rdrobust(y=data_fuzzy['employees'], x=data_fuzzy['x'], c=650))
@@ -467,8 +412,23 @@ fuzzy_result = rdrobust(
 print("Fuzzy RDD result:")
 print(fuzzy_result)
 
-# With covariates (reduces SE without changing estimate)
-covariates_fuzzy = data_fuzzy[['business_age', 'employees']].values
+# Match the outcome and treatment jumps to the main fuzzy model's windows.
+fuzzy_reduced_form = rdrobust(
+    y=data_fuzzy['y'], x=data_fuzzy['x'], c=650,
+    h=fuzzy_result.bws.loc['h'].values, b=fuzzy_result.bws.loc['b'].values
+)
+fuzzy_first_stage = rdrobust(
+    y=data_fuzzy['D'], x=data_fuzzy['x'], c=650,
+    h=fuzzy_result.bws.loc['h'].values, b=fuzzy_result.bws.loc['b'].values
+)
+fuzzy_ratio = fuzzy_reduced_form.coef.iloc[0, 0] / fuzzy_first_stage.coef.iloc[0, 0]
+assert np.isclose(fuzzy_ratio, fuzzy_result.coef.iloc[0, 0], rtol=0, atol=1e-6)
+print(f"Outcome jump: R${fuzzy_reduced_form.coef.iloc[0, 0]:.2f}")
+print(f"Loan probability jump: {100 * fuzzy_first_stage.coef.iloc[0, 0]:.2f} percentage points")
+print(f"LATE: R${fuzzy_ratio:.2f}")
+
+# With covariates (for precision)
+covariates_fuzzy = data_fuzzy[['business_age', 'employees', 'annual_revenue']].values
 fuzzy_result_cov = rdrobust(
     y=data_fuzzy['y'],
     x=data_fuzzy['x'],
@@ -512,7 +472,8 @@ rdplot(
     y=subset_data_fuzzy['y'],
     x=subset_data_fuzzy['x'],
     c=650,
-    title="Fuzzy RDD: loan effect on secondary revenue",
+    p=1, h=fuzzy_result.bws.loc['h'].values, kernel='triangular',
+    title="Fuzzy RDD: secondary revenue at the cutoff",
     y_label="Secondary revenue (R$)",
     x_label="Credit score"
 )
