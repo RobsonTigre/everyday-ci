@@ -432,20 +432,12 @@ ax.scatter(data_fuzzy['x'], data_fuzzy['D'], alpha=0.15, s=8, color='gray')
 below_data = data_fuzzy[data_fuzzy['x'] < 650].sort_values('x')
 above_data = data_fuzzy[data_fuzzy['x'] >= 650].sort_values('x')
 
-lowess_below = lowess(below_data['D'], below_data['x'], frac=0.3)
-lowess_above = lowess(above_data['D'], above_data['x'], frac=0.3)
+lowess_below = lowess(below_data['D'], below_data['x'], frac=0.3, it=0)
+lowess_above = lowess(above_data['D'], above_data['x'], frac=0.3, it=0)
 
 ax.plot(lowess_below[:, 0], lowess_below[:, 1], color='#2E86AB', linewidth=1.2)
-ax.fill_between(lowess_below[:, 0],
-                lowess_below[:, 1] - 0.05,
-                lowess_below[:, 1] + 0.05,
-                color='#2E86AB', alpha=0.2)
 
 ax.plot(lowess_above[:, 0], lowess_above[:, 1], color='#2E86AB', linewidth=1.2)
-ax.fill_between(lowess_above[:, 0],
-                lowess_above[:, 1] - 0.05,
-                lowess_above[:, 1] + 0.05,
-                color='#2E86AB', alpha=0.2)
 
 ax.axvline(x=650, linestyle='--', color='#F18F01', linewidth=1.2)
 ax.set_ylim(0, 1)

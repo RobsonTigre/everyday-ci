@@ -22,7 +22,15 @@ Add new concerns using the next unused ID. Keep detailed logs outside this file.
 
 ## Current
 
-No analytical repair is currently underway.
+Issue 27 is implemented and verified on `fix/fuzzy-rd-python-plot`. The
+Python probability curve preserves genuine binary outcomes and has no unsupported
+shading. Merge and push remain pending; the original next task below is deferred.
+
+- [x] Inspect the current script and preserve the baseline.
+- [x] Add and run a failing probability/ribbon regression test.
+- [x] Apply the two LOWESS argument changes and remove the fixed-width bands.
+- [x] Pass the regression tests and compare R/Python figures on the same CSV.
+- [x] Verify exact scope and record the results in Review.
 
 Next proposed analytical task: **issue 5**, reproduce Chapter 5 IV uncertainty.
 Next action: run the Chapter 5 noncompliance example on its actual data and compare
@@ -145,11 +153,6 @@ CausalImpact migration report. No pending model was rerun to create this list.
   Done when: Glyphs and bars are legible in the exported artifact; counts are preserved.
   Evidence: original student-script report, issue 26 (historical run).
 
-- [ ] **Issue 27.** Historical concern: **Chapter 8 Python uses arbitrary LOWESS shading.** The shaded region is a fixed ±0.05 around the smoothed line, rather than estimated uncertainty. It is not labelled a 95% interval, but readers could mistake it for one. See [Chapter 8 Python:439](<../8. Regression discontinuity design Cutoffs as natural experiments.py#L439>).
-  Next action: Run the Chapter 8 LOWESS figure and inspect the calculation and labelling of its shaded region.
-  Done when: Readers can identify what the band represents; any uncertainty claim is supported by its calculation.
-  Evidence: original student-script report, issue 27 (historical run).
-
 - [ ] **Issue 28.** Historical concern: **Some R scripts overwrite input CSVs.** Chapters 6, 10 and 12 deliberately regenerate seven datasets during execution. That can replace a student’s edits. The audit found no substantive data drift; preserving edited inputs is the unresolved behavior choice. Example: [Chapter 6 R:88](<../6. Causal assumptions Think first, regress later.R#L88>).
   Next action: Inventory the seven regenerated CSVs and compare before/after hashes in a disposable copy.
   Done when: Robson chooses whether regeneration remains intentional; any approved change preserves the book DGP and has a relevant regression check.
@@ -205,6 +208,12 @@ this checklist-only task.
 - [x] **Issue 12. R/Python CausalImpact weekly seasonality.** Commit `42186d8`.
   Verification: tests/test_time_series_causalimpact.py checks seasonal posterior samples in all three examples.
 
+### Verified on the task branch
+
+- [x] **Issue 27. Chapter 8 Python fuzzy RD probability plot.** Disabled residual reweighting in both LOWESS calls and removed the arbitrary fixed-width shading.
+  Verification: `python -m unittest discover -s tests -p test_fuzzy_rd_plot.py -v` fails before the patch and passes all 3 tests after it. Same-data R/Python comparison: maximum curve difference 2.15 percentage points; jumps 63.10 and 61.85 percentage points, respectively.
+  Evidence: `/tmp/fuzzy-rd-plot-fix-20261018/`; regenerated Python figure and side-by-side comparison are in the ignored `images/` directory. Merge and push remain pending.
+
 ### Other completed work
 
 - [x] Create and verify the central task list and its narrow ignore-rule exception.
@@ -236,6 +245,18 @@ all other tracked files match HEAD byte for byte. `git diff --check` passed.
 Only `.gitignore` and `tasks/todo.md` changed. These creation-stage checks
 preceded publication, which Robson subsequently authorized on 2026-10-10.
 Statistical tests were not rerun for this documentation-only patch.
+
+### Issue 27 review — 2026-10-18
+
+The 3 regression tests failed on the original code and passed after the approved
+patch. Both real plotting blocks were executed on the unchanged published CSV;
+curve differences stayed below 3.00 percentage points and jump differences below
+2.00 percentage points. Both figures were inspected for legibility and the fuzzy
+uptake pattern. The R source, dataset, and Python estimation sections remain
+byte-for-byte unchanged. R retains calculated confidence bands; Python omits
+shading. No new dependency, manuscript edit, or unrelated analytical rerun was
+needed. The repair changes the Chapter 8 Python source, its regression test, and
+this checklist; generated images are ignored. `git diff --check` passed.
 
 ## Evidence and limits
 
